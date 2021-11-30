@@ -10,5 +10,5 @@ import org.springframework.stereotype.Repository;
  * @date 2021-05-17 16:40:34
  */
 @Repository
-public interface QqCookieRelateMapper extends BaseMapper<CookieLib> {
+public interface CookieLibMapper extends BaseMapper<CookieLib> {
 }

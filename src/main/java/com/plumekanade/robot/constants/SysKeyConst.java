@@ -2,6 +2,7 @@ package com.plumekanade.robot.constants;
 
 /**
  * 系统配置键常量 system_config -> param
+ * 根据自身数据库设置 可不需要
  * @version 1.0
  * @author kanade
  * @date 2021-11-30 15:11
@@ -24,5 +25,8 @@ public class SysKeyConst {
   public static final String TENCENT_API_APP_ID = "tencentApiAppId";
   public static final String TENCENT_API_SECRET_ID = "tencentApiSecretId";
   public static final String TENCENT_API_SECRET_KEY = "tencentApiSecretKey";
+  public static final String LI_YUE = "liYue";
+  public static final String REMIND_IMG = "remindImg";
+  public static final String REMIND_IMG_SEXY = "remindImgSexy";
 
 }
