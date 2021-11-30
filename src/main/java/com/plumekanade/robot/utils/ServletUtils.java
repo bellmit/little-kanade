@@ -40,7 +40,7 @@ public class ServletUtils {
   /**
    * 通用get
    */
-  private static HttpEntity get(String url) throws Exception {
+  public static HttpEntity get(String url) throws Exception {
     // 创建Httpclient对象
     CloseableHttpClient httpclient = HttpClients.createDefault();
     // 创建http GET 并 发起请求

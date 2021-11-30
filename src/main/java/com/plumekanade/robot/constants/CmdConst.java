@@ -15,7 +15,6 @@ public class CmdConst {
   public static final String RANDOM_IMAGE = "随机图片";
   public static final String RANDOM_SEXY = "随机涩图";
   public static final String UPDATE_GALLERY = "更新图库";
-  public static final String DAMAGE_CAL = "伤害计算";
   public static final String DAILY_TAROT = "每日塔罗";
 
   // 指令/参数分隔符

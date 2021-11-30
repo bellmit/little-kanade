@@ -50,7 +50,7 @@ public class ProjectConst {
   // 逗号
   public static final String COMMA = ",";
   public static final String RELEASE = "release";
-  public static final String FORBID_WORD = "立华奏橘奏TachibalaKanade天使的心跳AngelBeatsangelbeatsab";
+  public static final String FORBID_WORD = "立华奏橘奏立華 かなでたちばな かなでTachibalaKanade天使的心跳AngelBeatsangelbeatsab";
 
   // 请求类型
   public static final String CONTENT_TYPE = "Content-Type";

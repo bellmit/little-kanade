@@ -27,7 +27,7 @@ public class CookieLib implements Serializable {
   // 游戏角色id
   @TableId(type = IdType.AUTO)
   private String id;
-  private String qq;
+  private Long qq;
   // 原神游戏角色id
   private String ysId;
   // 米哈游账号cookie
@@ -39,13 +39,13 @@ public class CookieLib implements Serializable {
   @JsonFormat(pattern = DateConst.DT, timezone = DateConst.TZ)
   private Date updateTime;
 
-  public CookieLib(String qq, String ysId, String cookie) {
+  public CookieLib(Long qq, String ysId, String cookie) {
     this.ysId = ysId;
     this.qq = qq;
     this.mhyCookie = cookie;
   }
 
-  public CookieLib(String qq, String cookie) {
+  public CookieLib(Long qq, String cookie) {
     this.qq = qq;
     this.weiboCookie = cookie;
   }

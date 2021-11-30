@@ -3,37 +3,6 @@
 server:
   port: 9706
 
-sys-config:
-  qq:
-  wx:
-  mhyCookie:
-  robotName:
-  testGroup:
-  specialGroup:
-  domain:
-  wxAppId:
-  wxAppSecret:
-  wxAppToken:
-  wxAesKey:
-  wxOriginId:
-  nudges:
-    -
-    -
-    -
-    -
-    -
-    -
-  # 腾讯API密钥id以及密钥 appId ->
-  secretId:
-  secretKey:
-  # 腾讯只能对话平台botId
-  botId:
-  bots:
-    -
-    -
-    -
-    -
-
 spring:
   main:
     banner-mode: console

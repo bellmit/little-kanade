@@ -19,6 +19,8 @@ import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.message.code.MiraiCode;
 import net.mamoe.mirai.message.data.Image;
+import net.mamoe.mirai.message.data.MessageChainBuilder;
+import net.mamoe.mirai.message.data.PlainText;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -116,15 +118,16 @@ public class DynamicTask implements SchedulingConfigurer {
       log.info("【定时提醒】已被移出漓月群聊.....提醒任务结束!");
       return;
     }
+    MessageChainBuilder msgBuilder = new MessageChainBuilder();
     try {
       int[] time = CommonUtils.getSpiralAbyssSurplusDays();
-      String signMsg = handleWeiboMsg() + "米游社该签到了。\n距离深渊刷新还有" + time[0] + "天" + time[1] + "小时\n" + handleExtraMsg();
+      msgBuilder.append(new PlainText(handleWeiboMsg() + "米游社该签到了。\n距离深渊刷新还有" + time[0] + "天" + time[1] + "小时\n" + handleExtraMsg()));
       if (Boolean.parseBoolean(systemConfigService.getVal(SysKeyConst.REMIND_IMG))) {
-        Image image = Contact.uploadImage(group, new File(galleryService.randomImg(Integer.parseInt(systemConfigService.getVal(SysKeyConst.REMIND_IMG_SEXY)))));
-        signMsg += MiraiCode.serializeToMiraiCode(image);
+        int sexy = Integer.parseInt(systemConfigService.getVal(SysKeyConst.REMIND_IMG_SEXY));
+        msgBuilder.append(Contact.uploadImage(group, new File(galleryService.randomImg(sexy))));
       }
-      log.info("【定时提醒】消息内容: " + signMsg);
-      group.sendMessage(signMsg);
+      log.info("【定时提醒】消息内容: " + msgBuilder);
+      group.sendMessage(msgBuilder.build());
 
       // 微信提醒
       handleWechatTask();

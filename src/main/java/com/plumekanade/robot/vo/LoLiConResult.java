@@ -112,6 +112,10 @@ public class LoLiConResult implements Serializable {
      * 原图url地址
      */
     private String original;
+    /**
+     * 原图url地址
+     */
+    private String regular;
   }
 
 }

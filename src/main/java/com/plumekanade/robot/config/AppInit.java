@@ -8,9 +8,11 @@ import com.plumekanade.robot.constants.CmdConst;
 import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.handler.BotEventHandler;
 import com.plumekanade.robot.service.SystemConfigService;
+import com.plumekanade.robot.utils.MiHoYoUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
+import net.mamoe.mirai.utils.BotConfiguration;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
@@ -36,6 +38,11 @@ public class AppInit implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
+    BotConst.NAME = systemConfigService.getVal(SysKeyConst.BOT_NAME);
+    BotConst.QQ = systemConfigService.getVal(SysKeyConst.QQ);
+    BotConst.REPEAT_MODE = Boolean.parseBoolean(systemConfigService.getVal(SysKeyConst.REPEAT_MODE));
+    MiHoYoUtils.COOKIE = systemConfigService.getVal(SysKeyConst.MHY_COOKIE);
+
     log.info("\nGuard skill, Distortion! Guard skill, Hand Sonic! Guard skill, Wing! Guard skill, Overdrive! kanade has finished armed!\n");
   }
 
@@ -46,36 +53,25 @@ public class AppInit implements ApplicationRunner {
   public Bot bot() {
     // 默认只取一个 后面有需要再改多个
 //    List<SystemConfig> list = systemConfigService.getLikeValList(SysKeyConst.BOT_AUTH);
-//    Bot bot = BotFactory.INSTANCE.newBot(Long.parseLong(sysConfig.getBots().get(0)), sysConfig.getBots().get(1), new BotConfiguration() {
-//      {
-//        // 保存设备信息到文件
-//        fileBasedDeviceInfo("deviceInfo.json");
-//        // 设置登录协议
-////        setProtocol(MiraiProtocol.ANDROID_WATCH);
-//      }
-//    });
 
     String[] arr = systemConfigService.getVal(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
-    Bot bot = BotFactory.INSTANCE.newBot(Long.parseLong(arr[0]), arr[1]);
+    Bot bot = BotFactory.INSTANCE.newBot(Long.parseLong(arr[0]), arr[1], new BotConfiguration() {
+      {
+        // 移除bot日志以及网络日志
+        noBotLog();
+        noNetworkLog();
+        // 指定设备信息
+        fileBasedDeviceInfo();
+      }
+    });
     try {
       bot.login();
       bot.getEventChannel().registerListenerHost(botEventHandler);
-
-      BotConst.NAME = systemConfigService.getVal(SysKeyConst.BOT_NAME);
+      log.info("【机器人登录】小奏登录成功!");
     } catch (Exception e) {
-      log.error("【Bot登录】机器人登录出现异常, 账密: {} - {}, 堆栈信息: ", arr[0], arr[1], e);
+      log.error("【机器人登录】机器人登录出现异常, 账密: {} - {}, 堆栈信息: ", arr[0], arr[1], e);
     }
     return bot;
-  }
-
-  /**
-   * Mybatis-Plus分页插件
-   */
-  @Bean
-  public MybatisPlusInterceptor paginationInterceptor() {
-    MybatisPlusInterceptor interceptor = new MybatisPlusInterceptor();
-    interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
-    return interceptor;
   }
 
 }
