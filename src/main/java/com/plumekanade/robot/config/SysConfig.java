@@ -21,9 +21,8 @@ public class SysConfig {
   private String wx;
   private String mhyCookie;
   private String robotName;
-  private Long testGroup;
-  private Long specialGroup;
   private String domain;
+  private String galleryUrl;
   private String wxAppId;
   private String wxAppSecret;
   private String wxAppToken;

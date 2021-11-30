@@ -1,7 +1,9 @@
 package com.plumekanade.robot.config;
 
+import com.plumekanade.robot.entity.SystemConfig;
 import com.plumekanade.robot.handler.WechatMsgHandler;
 import com.plumekanade.robot.handler.WechatScanHandler;
+import com.plumekanade.robot.service.SystemConfigService;
 import me.chanjar.weixin.common.api.WxConsts;
 import me.chanjar.weixin.common.redis.JedisWxRedisOps;
 import me.chanjar.weixin.mp.api.WxMpMessageRouter;
@@ -15,6 +17,8 @@ import redis.clients.jedis.JedisPool;
 
 import javax.annotation.Resource;
 
+import java.util.List;
+
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
 
 /**
@@ -26,29 +30,30 @@ import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
 @Configuration
 public class WechatConfig {
 
-  private final SysConfig sysConfig;
   private final WechatMsgHandler wechatMsgHandler;
   private final WechatScanHandler wechatScanHandler;
+  private final SystemConfigService systemConfigService;
 
   private static final String WECHAT = "wechat";
 
   @Resource(name = "redisZero")
   private JedisPool zero;
 
-  public WechatConfig(SysConfig sysConfig, WechatMsgHandler wechatMsgHandler, WechatScanHandler wechatScanHandler) {
-    this.sysConfig = sysConfig;
+  public WechatConfig(WechatMsgHandler wechatMsgHandler, WechatScanHandler wechatScanHandler, SystemConfigService systemConfigService) {
     this.wechatMsgHandler = wechatMsgHandler;
     this.wechatScanHandler = wechatScanHandler;
+    this.systemConfigService = systemConfigService;
   }
 
   @Bean
   public WxMpService wxMpService() {
+    List<SystemConfig> list = systemConfigService.getLikeValList("wx");
     WxMpService service = new WxMpServiceImpl();
     WxMpDefaultConfigImpl configStorage = new WxMpRedisConfigImpl(new JedisWxRedisOps(zero), WECHAT);
-    configStorage.setAppId(sysConfig.getWxAppId());
-    configStorage.setSecret(sysConfig.getWxAppSecret());
-    configStorage.setToken(sysConfig.getWxAppToken());
-    configStorage.setAesKey(sysConfig.getWxAesKey());
+    configStorage.setAppId(list.get(0).getVal());
+    configStorage.setSecret(list.get(1).getVal());
+    configStorage.setToken(list.get(2).getVal());
+    configStorage.setAesKey(list.get(3).getVal());
     service.setWxMpConfigStorage(configStorage);
     return service;
   }
