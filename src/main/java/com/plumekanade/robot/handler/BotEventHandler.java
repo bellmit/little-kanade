@@ -132,7 +132,7 @@ public class BotEventHandler extends SimpleListenerHost {
    * 处理群戳一戳
    */
   @EventHandler
-  private void handleGroupNudge(@NotNull NudgeEvent event, GroupMessageEvent groupEvent) {
+  private void handleGroupNudge(@NotNull NudgeEvent event) {
     Long botId = event.getBot().getId();
     UserOrBot from = event.getFrom();
     UserOrBot target = event.getTarget();
@@ -143,9 +143,16 @@ public class BotEventHandler extends SimpleListenerHost {
     List<String> replyList = botChatService.getNudges();
     int size = replyList.size();
     int i = CommonUtils.RANDOM.nextInt(size + 1);
-//    if (i == size) {
-//
-//    }
+
+    try {
+      // 群号id event.getSubject().getId()
+      Group group = Objects.requireNonNull(event.getBot().getGroup(event.getSubject().getId()));
+      if (i == size) {
+        Objects.requireNonNull(group.get(from.getId())).mute(CommonUtils.RANDOM.nextInt(541) + 60);
+      }
+    } catch (Exception e) {
+      log.error("【戳一戳】处理戳一戳消息失败, 堆栈信息: ", e);
+    }
   }
 
 
