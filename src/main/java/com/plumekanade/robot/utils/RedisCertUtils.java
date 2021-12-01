@@ -1,6 +1,7 @@
 package com.plumekanade.robot.utils;
 
 import com.plumekanade.robot.constants.DateConst;
+import com.plumekanade.robot.entity.GroupConfig;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 import redis.clients.jedis.Jedis;
@@ -24,6 +25,7 @@ public class RedisCertUtils {
   private JedisPool redisCert;
 
   private static final String WECHAT_USER = "wxUser:";
+  private static final String GROUP = "group:";
   private static final String RANDOM_IMG_COOL = "randomImgCool:";
 
   /**
@@ -70,6 +72,29 @@ public class RedisCertUtils {
       return cool == null ? null : Long.parseLong(cool);
     } catch (Exception e) {
       log.error("【Redis】判断随机图片是否冷却中出现异常, 堆栈信息: ", e);
+    }
+    return null;
+  }
+
+  /**
+   * 设置群配置
+   */
+  public void setGroupConfig(String groupId, String val) {
+    try(Jedis jedis = redisCert.getResource()){
+      jedis.set(GROUP + groupId, val, SetParams.setParams().ex(DateConst.WEEK_SECONDS));
+    } catch (Exception e) {
+      log.error("【Redis】设置群配置信息失败, 堆栈信息: ", e);
+    }
+  }
+
+  /**
+   * 获取群配置
+   */
+  public GroupConfig getGroupConfig(String groupId) {
+    try(Jedis jedis = redisCert.getResource()) {
+      return MapperUtils.deserialize(jedis.get(GROUP + groupId), GroupConfig.class);
+    } catch (Exception e) {
+      log.error("【Redis】获取群配置信息失败, 堆栈信息: ", e);
     }
     return null;
   }

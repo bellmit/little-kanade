@@ -8,7 +8,9 @@ package com.plumekanade.robot.constants;
  */
 public class BotConst {
 
+  // 机器人名称
   public static String NAME;
+  // 主人QQ
   public static String QQ;
   // 复读机模式
   public static boolean REPEAT_MODE = false;

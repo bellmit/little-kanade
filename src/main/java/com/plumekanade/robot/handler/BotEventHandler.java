@@ -6,24 +6,20 @@ import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.CookieLib;
 import com.plumekanade.robot.entity.GroupConfig;
 import com.plumekanade.robot.entity.Tarot;
-import com.plumekanade.robot.service.CookieLibService;
-import com.plumekanade.robot.service.GalleryService;
-import com.plumekanade.robot.service.GroupConfigService;
-import com.plumekanade.robot.service.TarotService;
+import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.*;
 import com.plumekanade.robot.vo.GenshinInfo;
 import com.plumekanade.robot.vo.LoLiConReq;
 import com.plumekanade.robot.vo.LoLiConResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.contact.Contact;
-import net.mamoe.mirai.contact.Friend;
-import net.mamoe.mirai.contact.UserOrBot;
+import net.mamoe.mirai.contact.*;
 import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.SimpleListenerHost;
 import net.mamoe.mirai.event.events.FriendMessageEvent;
 import net.mamoe.mirai.event.events.GroupMessageEvent;
 import net.mamoe.mirai.event.events.NudgeEvent;
+import net.mamoe.mirai.internal.network.protocol.packet.chat.TroopManagement;
 import net.mamoe.mirai.message.data.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -44,6 +40,8 @@ import static com.plumekanade.robot.constants.CmdConst.*;
 public class BotEventHandler extends SimpleListenerHost {
 
   private final TarotService tarotService;
+  private final BotDicService botDicService;
+  private final BotChatService botChatService;
   private final RedisCertUtils redisCertUtils;
   private final RedisChatUtils redisChatUtils;
   private final GalleryService galleryService;
@@ -83,14 +81,14 @@ public class BotEventHandler extends SimpleListenerHost {
         }
       }
       friend.sendMessage(result);
-      return;
+//      return;
     }
 
-
-    if (msgText.startsWith(SEPARATOR2)) {
-      handleCmd(null, friend, msgText.replace(SEPARATOR2, ""));
-      return;
-    }
+    // 取消私聊指令 太麻烦了
+//    if (msgText.startsWith(SEPARATOR2)) {
+//      handleCmd(null, friend, msgText.replace(SEPARATOR2, ""));
+//      return;
+//    }
 
   }
 
@@ -105,7 +103,7 @@ public class BotEventHandler extends SimpleListenerHost {
     log.info("【群消息】" + event.getMessage().serializeToMiraiCode());
 
     if (msg.startsWith(SEPARATOR2)) {
-      handleCmd(event, null, msg.replace(SEPARATOR2, ""));
+      handleCmd(event, msg.replace(SEPARATOR2, ""));
       return;
     }
 
@@ -136,10 +134,20 @@ public class BotEventHandler extends SimpleListenerHost {
    * 处理群戳一戳
    */
   @EventHandler
-  private void handleGroupNudge(@NotNull NudgeEvent event) {
+  private void handleGroupNudge(@NotNull NudgeEvent event, GroupMessageEvent groupEvent) {
+    Long botId = event.getBot().getId();
     UserOrBot from = event.getFrom();
     UserOrBot target = event.getTarget();
     log.info("【戳一戳】{}({}) {} {}({})", from.getNick(), from.getId(), event.getAction(), target.getNick(), target.getId());
+    if (!botId.equals(target.getId())) {
+      return;
+    }
+    List<String> replyList = botChatService.getNudges();
+    int size = replyList.size();
+    int i = CommonUtils.RANDOM.nextInt(size + 1);
+//    if (i == size) {
+//
+//    }
   }
 
 
@@ -148,9 +156,12 @@ public class BotEventHandler extends SimpleListenerHost {
    *
    * @date 2021-08-24 16:04
    */
-  private void handleCmd(GroupMessageEvent groupMsgEvent, Friend friend, String msgText) {
+  private void handleCmd(GroupMessageEvent groupMsgEvent, String msgText) {
+    Member sender = groupMsgEvent.getSender();
+    Group group = groupMsgEvent.getGroup();
     String[] msgArr = msgText.split(SEPARATOR);
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
+
     switch (msgArr[0]) {
       // 指令列表
       case CMD_LIST -> msgBuilder.append("""
@@ -168,7 +179,7 @@ public class BotEventHandler extends SimpleListenerHost {
       case QUERY_ACCOUNT2 -> msgBuilder.append(handleQA(msgArr, ProjectConst.B_SERVER));
       case GAIN_CHARACTER -> {
         try {
-          CookieLib cookieLib = cookieLibService.getCookie(null == friend ? groupMsgEvent.getSender().getId() : friend.getId());
+          CookieLib cookieLib = cookieLibService.getCookie(sender.getId());
           if (null != cookieLib) {
             msgBuilder.append(MiHoYoUtils.getRoles(cookieLib.getMhyCookie(), false));
           } else {
@@ -180,40 +191,33 @@ public class BotEventHandler extends SimpleListenerHost {
         }
       }
       case RANDOM_IMAGE -> {
-        // 私聊不限制图片类型
-        int sexyState = 2;
-        String code = String.valueOf(null == friend ? groupMsgEvent.getGroup().getId() : friend.getId());
-        String result = handleCheckCooling(code);
-        if (null != result) {
-          msgBuilder.append(result);
-          break;
+        String groupId = String.valueOf(group.getId());
+        synchronized (groupId.intern()) {
+          String result = handleCheckCooling(groupId);
+          if (null != result) {
+            msgBuilder.append(result);
+            break;
+          }
+          redisCertUtils.setRandomImgCoolTime(groupId);
         }
-        if (null != groupMsgEvent) {
-          GroupConfig config = groupConfigService.getConfig(code);
-          sexyState = null == config ? 0 : config.getSexyState();
-        }
-        redisCertUtils.setRandomImgCoolTime(code);
-        msgBuilder.append(galleryService.randomImg(sexyState));
+        msgBuilder.append(Contact.uploadImage(group, new File(galleryService.randomImg(groupConfigService.getGroupSexy(groupId)))));
       }
       case UPDATE_GALLERY -> {
-        galleryService.updateGallery(ProjectConst.NORMAL_GALLERY_PATH, 0);
-        galleryService.updateGallery(ProjectConst.SEXY_GALLERY_PATH, 1);
-        galleryService.updateGallery(ProjectConst.BARE_GALLERY_PATH, 2);
-        msgBuilder.append("图库已更新完成");
+        if (BotConst.QQ.equals(String.valueOf(sender.getId()))) {
+          galleryService.updateGallery(ProjectConst.NORMAL_GALLERY_PATH, 0);
+          galleryService.updateGallery(ProjectConst.SEXY_GALLERY_PATH, 1);
+          galleryService.updateGallery(ProjectConst.BARE_GALLERY_PATH, 2);
+          msgBuilder.append("图库已更新完成");
+        }
       }
       case QIU_QIU_TRANSLATION -> msgBuilder.append("小奏还没有学会丘丘语翻译呢");
-      case RANDOM_SEXY -> handleRandomSexy(groupMsgEvent, friend, msgBuilder, msgArr);
+      case RANDOM_SEXY -> handleRandomSexy(groupMsgEvent, msgBuilder, msgArr);
       case DAILY_TAROT -> handleDailyTarot(groupMsgEvent, msgBuilder);
       default -> msgBuilder.append("?");
     }
 
-    // 向群组/个人发送消息
-    if (null == friend) {
-      groupMsgEvent.getGroup().sendMessage(msgBuilder.build());
-    } else {
-      friend.sendMessage(msgBuilder.build());
-    }
-
+    // 发送消息
+    group.sendMessage(msgBuilder.build());
   }
 
   /**
@@ -251,9 +255,9 @@ public class BotEventHandler extends SimpleListenerHost {
   /**
    * 随机涩图处理逻辑
    */
-  private void handleRandomSexy(GroupMessageEvent groupMsgEvent, Friend friend, MessageChainBuilder builder, String[] msgArr) {
-    String memberCode = String.valueOf(null == friend ? groupMsgEvent.getSender().getId() : friend.getId());
-    String code = String.valueOf(null == groupMsgEvent ? friend.getId() : groupMsgEvent.getGroup().getId());
+  private void handleRandomSexy(GroupMessageEvent groupMsgEvent, MessageChainBuilder builder, String[] msgArr) {
+    String memberCode = String.valueOf(groupMsgEvent.getSender().getId());
+    String code = String.valueOf(groupMsgEvent.getGroup().getId());
     if (!BotConst.QQ.equals(memberCode)) {
       String result = handleCheckCooling(code);
       if (null != result) {
@@ -302,7 +306,7 @@ public class BotEventHandler extends SimpleListenerHost {
               url = loLiConResult.getUrls().getOriginal();
             }
             InputStream is = Objects.requireNonNull(ServletUtils.get(url)).getContent();
-            builder.append(Contact.uploadImage(friend == null ? groupMsgEvent.getGroup() : friend, is)).append(ProjectConst.WRAP)
+            builder.append(Contact.uploadImage(groupMsgEvent.getGroup(), is)).append(ProjectConst.WRAP)
                 .append("作者：").append(loLiConResult.getAuthor()).append(" - ").append(loLiConResult.getPid().toString());
           } catch (Exception e) {
             log.error("【随机涩图】获取涩图出现异常, 堆栈信息: ", e);

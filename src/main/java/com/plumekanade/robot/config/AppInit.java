@@ -19,6 +19,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 import javax.annotation.Resource;
+import java.util.Map;
 
 /**
  * 随启动执行
@@ -38,12 +39,11 @@ public class AppInit implements ApplicationRunner {
 
   @Override
   public void run(ApplicationArguments args) {
-    BotConst.NAME = systemConfigService.getVal(SysKeyConst.BOT_NAME);
-    BotConst.QQ = systemConfigService.getVal(SysKeyConst.QQ);
-    BotConst.REPEAT_MODE = Boolean.parseBoolean(systemConfigService.getVal(SysKeyConst.REPEAT_MODE));
-    MiHoYoUtils.COOKIE = systemConfigService.getVal(SysKeyConst.MHY_COOKIE);
-
-    log.info("\nGuard skill, Distortion! Guard skill, Hand Sonic! Guard skill, Wing! Guard skill, Overdrive! kanade has finished armed!\n");
+    Map<String, String> mapVal = systemConfigService.getMapVal();
+    BotConst.QQ = mapVal.get(SysKeyConst.QQ);
+    BotConst.NAME = mapVal.get(SysKeyConst.BOT_NAME);
+    MiHoYoUtils.COOKIE = mapVal.get(SysKeyConst.MHY_COOKIE);
+    BotConst.REPEAT_MODE = Boolean.parseBoolean(mapVal.get(SysKeyConst.REPEAT_MODE));
   }
 
   /**
@@ -67,7 +67,15 @@ public class AppInit implements ApplicationRunner {
     try {
       bot.login();
       bot.getEventChannel().registerListenerHost(botEventHandler);
-      log.info("【机器人登录】小奏登录成功!");
+      log.info("""
+          
+          ----------------------------
+          Guard skill, Distortion!
+          Guard skill, Hand Sonic!
+          Guard skill, Wing!
+          Guard skill, Overdrive!
+          kanade has finished armed!
+          ----------------------------""");
     } catch (Exception e) {
       log.error("【机器人登录】机器人登录出现异常, 账密: {} - {}, 堆栈信息: ", arr[0], arr[1], e);
     }
