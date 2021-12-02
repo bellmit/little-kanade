@@ -180,7 +180,7 @@ public class WechatMsgHandler implements WxMpMessageHandler {
             botTask.setExpireTime(expireTime);
             botTaskService.updateById(botTask);
           } else {
-            botTask = new BotTask(targetName, msgArr[2], DateConst.SDF.parse(msgArr[3]), expireTime, "1");
+            botTask = new BotTask(targetName, msgArr[2], DateConst.SDF.parse(msgArr[3]), expireTime, ProjectConst.ONE);
             botTaskService.save(botTask);
           }
           long hours = Duration.between(LocalDateTime.now(), expireTime).toHours();    // 相差的小时数
@@ -202,7 +202,7 @@ public class WechatMsgHandler implements WxMpMessageHandler {
           content = builder.length() > 0 ? builder.substring(0, builder.length() - 2) : "没有执行任何任务...";
         }
         case WEIBO_REMIND -> {
-          systemConfigService.setVal(SysKeyConst.WEIBO_NUM, StringUtils.isNotBlank(targetName) ? targetName : "0");
+          systemConfigService.setVal(SysKeyConst.WEIBO_NUM, StringUtils.isNotBlank(targetName) ? targetName : ProjectConst.ZERO);
           content = "已设置微博签到连续提醒" + targetName + "天";
         }
         case ATTACH_IMG -> {

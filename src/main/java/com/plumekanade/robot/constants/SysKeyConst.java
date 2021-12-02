@@ -28,5 +28,7 @@ public class SysKeyConst {
   public static final String LI_YUE = "liYue";
   public static final String REMIND_IMG = "remindImg";
   public static final String REMIND_IMG_SEXY = "remindImgSexy";
+  public static final String CANCEL_ANGRY = "cancelAngry";
+  public static final String AWAKE_KEYWORD = "awakeKeyword";
 
 }

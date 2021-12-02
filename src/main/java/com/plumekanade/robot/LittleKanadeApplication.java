@@ -29,5 +29,4 @@ public class LittleKanadeApplication {
     interceptor.addInnerInterceptor(new PaginationInnerInterceptor(DbType.MYSQL));
     return interceptor;
   }
-
 }

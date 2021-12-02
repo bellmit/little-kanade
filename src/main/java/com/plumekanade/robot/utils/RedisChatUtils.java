@@ -1,6 +1,7 @@
 package com.plumekanade.robot.utils;
 
 import com.plumekanade.robot.constants.DateConst;
+import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.Tarot;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
@@ -33,6 +34,8 @@ public class RedisChatUtils {
   private static final String COOLING = "cooling:";
   // 塔罗牌前缀
   private static final String TAROT = "tarot:";
+  // 将要生气
+  private static final String ANGRY = "angry:";
 
   /**
    * 设置复读语句
@@ -106,4 +109,51 @@ public class RedisChatUtils {
     return null;
   }
 
+  /**
+   * 设置机器人将要生气标记 30~90秒
+   */
+  public void setWillAngryFlag(String groupId) {
+    try(Jedis jedis = redisChat.getResource()) {
+      jedis.set(ANGRY + groupId, ProjectConst.ZERO, SetParams.setParams().ex(CommonUtils.RANDOM.nextLong(DateConst.SIXTY) + 30L));
+    } catch (Exception e) {
+      log.error("【Redis】设置机器人即将生气标记失败, 堆栈信息: ", e);
+    }
+  }
+
+  /**
+   * 获取机器人即将生气标记
+   * 0还没生气(未执行生气后相关功能)
+   * 1已生气(已执行生气后相关功能)
+   */
+  public String getWillAngryFlag(Long groupId) {
+    try(Jedis jedis = redisChat.getResource()) {
+      return jedis.get(ANGRY + groupId);
+    }catch (Exception e) {
+      log.error("【Redis】获取机器人生气标记失败, 堆栈信息: ", e);
+    }
+    return null;
+  }
+
+  /**
+   * 设置机器人已经生气
+   */
+  public void setAngry(Long groupId) {
+    try(Jedis jedis = redisChat.getResource()) {
+      jedis.set(ANGRY + groupId, ProjectConst.ONE, SetParams.setParams().ex(DateConst.SIXTY * 10));
+    } catch (Exception e) {
+      log.error("【Redis】设置机器人生气标记失败, 堆栈信息: ", e);
+    }
+  }
+
+
+  /**
+   * 移除机器人生气标记
+   */
+  public void cancelAngry(Long groupId) {
+    try(Jedis jedis = redisChat.getResource()) {
+      jedis.del(ANGRY + groupId);
+    } catch (Exception e) {
+      log.error("【Redis】取消机器人生气标记失败, 堆栈信息: ", e);
+    }
+  }
 }

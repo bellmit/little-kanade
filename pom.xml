@@ -79,13 +79,13 @@
                         </exclude>
                     </excludes>
                     <!-- 重写包含依赖，包含不存在的依赖，jar里没有pom里的依赖 使用外部配置文件，jar包里没有资源文件 -->
-<!--                    <includes>-->
-<!--                        <include>-->
-<!--                            <groupId>null</groupId>-->
-<!--                            <artifactId>null</artifactId>-->
-<!--                        </include>-->
-<!--                    </includes>-->
-<!--                    <layout>ZIP</layout>-->
+                    <includes>
+                        <include>
+                            <groupId>null</groupId>
+                            <artifactId>null</artifactId>
+                        </include>
+                    </includes>
+                    <layout>ZIP</layout>
                 </configuration>
             </plugin>
         </plugins>

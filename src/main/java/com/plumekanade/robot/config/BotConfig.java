@@ -1,60 +1,52 @@
 package com.plumekanade.robot.config;
 
-import com.baomidou.mybatisplus.annotation.DbType;
-import com.baomidou.mybatisplus.extension.plugins.MybatisPlusInterceptor;
-import com.baomidou.mybatisplus.extension.plugins.inner.PaginationInnerInterceptor;
 import com.plumekanade.robot.constants.BotConst;
 import com.plumekanade.robot.constants.CmdConst;
+import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.handler.BotEventHandler;
 import com.plumekanade.robot.service.SystemConfigService;
 import com.plumekanade.robot.utils.MiHoYoUtils;
+import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.utils.BotConfiguration;
-import org.springframework.boot.ApplicationArguments;
-import org.springframework.boot.ApplicationRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Map;
 
 /**
- * 随启动执行
- *
  * @author kanade
- * @version 1.0
- * @date 2021-05-24 11:47:28
+ * @date 2021-12-02 23:03
  */
 @Slf4j
 @Configuration
-public class AppInit implements ApplicationRunner {
+@AllArgsConstructor
+public class BotConfig {
 
-  @Resource
-  private BotEventHandler botEventHandler;
-  @Resource
-  private SystemConfigService systemConfigService;
-
-  @Override
-  public void run(ApplicationArguments args) {
-    Map<String, String> mapVal = systemConfigService.getMapVal();
-    BotConst.QQ = mapVal.get(SysKeyConst.QQ);
-    BotConst.NAME = mapVal.get(SysKeyConst.BOT_NAME);
-    MiHoYoUtils.COOKIE = mapVal.get(SysKeyConst.MHY_COOKIE);
-    BotConst.REPEAT_MODE = Boolean.parseBoolean(mapVal.get(SysKeyConst.REPEAT_MODE));
-  }
+  private final BotEventHandler botEventHandler;
+  private final SystemConfigService systemConfigService;
 
   /**
    * 初始化bot
    */
   @Bean
   public Bot bot() {
-    // 默认只取一个 后面有需要再改多个
-//    List<SystemConfig> list = systemConfigService.getLikeValList(SysKeyConst.BOT_AUTH);
+    Map<String, String> mapVal = systemConfigService.getMapVal();
+    // 配置写入
+    BotConst.QQ = Long.parseLong(mapVal.get(SysKeyConst.QQ));
+    BotConst.NAME = mapVal.get(SysKeyConst.BOT_NAME);
+    MiHoYoUtils.COOKIE = mapVal.get(SysKeyConst.MHY_COOKIE);
+    BotConst.REPEAT_MODE = Boolean.parseBoolean(mapVal.get(SysKeyConst.REPEAT_MODE));
+    BotConst.CANCEL_ANGRY = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.CANCEL_ANGRY).split(ProjectConst.COMMA)));
+    BotConst.AWAKE_KEYWORD = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.AWAKE_KEYWORD).split(ProjectConst.COMMA)));
 
-    String[] arr = systemConfigService.getVal(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
+    // 默认只取一个 后面有需要再改多个
+    String[] arr = mapVal.get(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
     Bot bot = BotFactory.INSTANCE.newBot(Long.parseLong(arr[0]), arr[1], new BotConfiguration() {
       {
         // 移除bot日志以及网络日志
@@ -67,6 +59,7 @@ public class AppInit implements ApplicationRunner {
     try {
       bot.login();
       bot.getEventChannel().registerListenerHost(botEventHandler);
+      BotConst.BOT = bot;
       log.info("""
           
           ----------------------------

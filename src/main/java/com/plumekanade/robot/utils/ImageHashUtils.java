@@ -1,5 +1,6 @@
 package com.plumekanade.robot.utils;
 
+import com.plumekanade.robot.constants.ProjectConst;
 import lombok.extern.slf4j.Slf4j;
 
 import javax.imageio.ImageIO;
@@ -53,7 +54,7 @@ public class ImageHashUtils {
     for (int x = 0; x < SMALLER_SIZE; x++) {
       for (int y = 0; y < SMALLER_SIZE; y++) {
         if (x != 0 && y != 0) {
-          hash.append((dctVal[x][y] > avg ? "1" : "0"));
+          hash.append((dctVal[x][y] > avg ? ProjectConst.ONE : ProjectConst.ZERO));
         }
       }
     }

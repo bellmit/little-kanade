@@ -153,7 +153,7 @@ public class DynamicTask implements SchedulingConfigurer {
         extraMsg.append(botTask.getMsg().replace("X", days + "天" + hours + "小时"));
       } else {    // 即将结束
         extraMsg.append(botTask.getMsg().replace("X", hours + "小时"));
-        botTask.setState("0");
+        botTask.setState(ProjectConst.ZERO);
         botTaskService.updateById(botTask);
       }
       extraMsg.append(ProjectConst.WRAP);
