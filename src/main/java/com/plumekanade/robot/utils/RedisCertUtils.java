@@ -57,7 +57,7 @@ public class RedisCertUtils {
    */
   public void setRandomImgCoolTime(String code) {
     try(Jedis jedis = redisCert.getResource()) {
-      jedis.set(RANDOM_IMG_COOL + code, String.valueOf(new Date().getTime() + 60000), SetParams.setParams().ex(DateConst.SIXTY));
+      jedis.set(RANDOM_IMG_COOL + code, String.valueOf(System.currentTimeMillis() + 60000), SetParams.setParams().ex(DateConst.SIXTY));
     } catch (Exception e) {
       log.error("【Redis】设置随机图片冷却时间失败, 堆栈信息: ", e);
     }

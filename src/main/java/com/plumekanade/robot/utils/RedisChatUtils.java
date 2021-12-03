@@ -36,6 +36,8 @@ public class RedisChatUtils {
   private static final String TAROT = "tarot:";
   // 将要生气
   private static final String ANGRY = "angry:";
+  // 机器人被禁言状态
+  private static final String MUTE = "mute:";
 
   /**
    * 设置复读语句
@@ -101,7 +103,7 @@ public class RedisChatUtils {
    * 获取每日塔罗牌
    */
   public Tarot getTarot(String accountCode) {
-    try(Jedis jedis = redisChat.getResource()) {
+    try (Jedis jedis = redisChat.getResource()) {
       return MapperUtils.deserialize(jedis.get(TAROT + accountCode), Tarot.class);
     } catch (Exception e) {
       log.error("【Redis】获取账号 {} 每日塔罗失败, 堆栈信息: ", accountCode, e);
@@ -113,7 +115,7 @@ public class RedisChatUtils {
    * 设置机器人将要生气标记 30~90秒
    */
   public void setWillAngryFlag(String groupId) {
-    try(Jedis jedis = redisChat.getResource()) {
+    try (Jedis jedis = redisChat.getResource()) {
       jedis.set(ANGRY + groupId, ProjectConst.ZERO, SetParams.setParams().ex(CommonUtils.RANDOM.nextLong(DateConst.SIXTY) + 30L));
     } catch (Exception e) {
       log.error("【Redis】设置机器人即将生气标记失败, 堆栈信息: ", e);
@@ -126,9 +128,9 @@ public class RedisChatUtils {
    * 1已生气(已执行生气后相关功能)
    */
   public String getWillAngryFlag(Long groupId) {
-    try(Jedis jedis = redisChat.getResource()) {
+    try (Jedis jedis = redisChat.getResource()) {
       return jedis.get(ANGRY + groupId);
-    }catch (Exception e) {
+    } catch (Exception e) {
       log.error("【Redis】获取机器人生气标记失败, 堆栈信息: ", e);
     }
     return null;
@@ -138,7 +140,7 @@ public class RedisChatUtils {
    * 设置机器人已经生气
    */
   public void setAngry(Long groupId) {
-    try(Jedis jedis = redisChat.getResource()) {
+    try (Jedis jedis = redisChat.getResource()) {
       jedis.set(ANGRY + groupId, ProjectConst.ONE, SetParams.setParams().ex(DateConst.SIXTY * 10));
     } catch (Exception e) {
       log.error("【Redis】设置机器人生气标记失败, 堆栈信息: ", e);
@@ -150,10 +152,45 @@ public class RedisChatUtils {
    * 移除机器人生气标记
    */
   public void cancelAngry(Long groupId) {
-    try(Jedis jedis = redisChat.getResource()) {
+    try (Jedis jedis = redisChat.getResource()) {
       jedis.del(ANGRY + groupId);
     } catch (Exception e) {
       log.error("【Redis】取消机器人生气标记失败, 堆栈信息: ", e);
     }
   }
+
+  /**
+   * 设置机器人被禁言状态
+   */
+  public void setBotMuteState(Long groupId, int seconds) {
+    try (Jedis jedis = redisChat.getResource()) {
+      jedis.set(MUTE + groupId, "" + System.currentTimeMillis(), SetParams.setParams().ex(Long.parseLong("" + seconds)));
+    } catch (Exception e) {
+      log.error("【Redis】设置机器人被禁言状态失败, 堆栈信息: ", e);
+    }
+  }
+
+  /**
+   * 移除机器人被禁言状态
+   */
+  public void delBotMuteState(Long groupId) {
+    try (Jedis jedis = redisChat.getResource()) {
+      jedis.del(MUTE + groupId);
+    } catch (Exception e) {
+      log.error("【Redis】移除机器人被禁言状态失败, 堆栈信息: ", e);
+    }
+  }
+
+  /**
+   * 判断机器人是否被禁言
+   */
+  public boolean isBotMuted(Long groupId) {
+    try (Jedis jedis = redisChat.getResource()) {
+      return jedis.exists(MUTE + groupId);
+    } catch (Exception e) {
+      log.error("【Redis】判断机器人是否被禁言失败, 堆栈信息: ", e);
+    }
+    return false;
+  }
+
 }

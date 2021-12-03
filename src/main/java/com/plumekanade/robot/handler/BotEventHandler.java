@@ -4,8 +4,8 @@ import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.plumekanade.robot.config.BotConfig;
 import com.plumekanade.robot.constants.BotConst;
 import com.plumekanade.robot.constants.ProjectConst;
-import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.CookieLib;
+import com.plumekanade.robot.entity.SystemConfig;
 import com.plumekanade.robot.entity.Tarot;
 import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.*;
@@ -14,13 +14,10 @@ import com.plumekanade.robot.vo.LoLiConReq;
 import com.plumekanade.robot.vo.LoLiConResult;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.*;
 import net.mamoe.mirai.event.EventHandler;
 import net.mamoe.mirai.event.SimpleListenerHost;
-import net.mamoe.mirai.event.events.FriendMessageEvent;
-import net.mamoe.mirai.event.events.GroupMessageEvent;
-import net.mamoe.mirai.event.events.NudgeEvent;
+import net.mamoe.mirai.event.events.*;
 import net.mamoe.mirai.message.data.*;
 import org.jetbrains.annotations.NotNull;
 import org.springframework.stereotype.Component;
@@ -38,7 +35,7 @@ import static com.plumekanade.robot.constants.CmdConst.*;
 @Slf4j
 @Component
 @AllArgsConstructor
-@SuppressWarnings("ConstantConditions")   // 去掉idea的警告
+@SuppressWarnings({"ConstantConditions", "unused"})   // 去掉idea的警告
 public class BotEventHandler extends SimpleListenerHost {
 
   private final TarotService tarotService;
@@ -100,13 +97,17 @@ public class BotEventHandler extends SimpleListenerHost {
    */
   @EventHandler
   private void handleGroupMsg(@NotNull GroupMessageEvent event) {
+    Group group = event.getGroup();
+    // 机器人被禁言中
+    if (group.getBotMuteRemaining() > 0) {
+      return;
+    }
 
-    String msg = event.getMessage().contentToString();
-    log.info("【群消息】收到 {} - {}({}) 的消息: {}", event.getGroup().getName(), event.getSenderName(), event.getSender().getId(), msg);
-    log.info("【群消息】" + event.getMessage().serializeToMiraiCode());
+    String msg = event.getMessage().serializeToMiraiCode();
+    log.info("【群消息】收到 {} - {}({}) 的消息: {}", group.getName(), event.getSenderName(), event.getSender().getId(), msg);
 
     // 生气了吗.jpg
-    boolean isAngry = checkBotAngry(event.getGroup().getId(), null);
+    boolean isAngry = checkBotAngry(group.getId(), null);
     if (isAngry) {
       return;
     }
@@ -115,7 +116,7 @@ public class BotEventHandler extends SimpleListenerHost {
     if (isAngry && msg.contains(BotConst.NAME)) {
       for (String word : BotConst.CANCEL_ANGRY) {
         if (msg.contains(word)) {
-          redisChatUtils.cancelAngry(event.getGroup().getId());
+          redisChatUtils.cancelAngry(group.getId());
         }
       }
     }
@@ -135,7 +136,7 @@ public class BotEventHandler extends SimpleListenerHost {
 
     // 记录文本, 复读
     if (BotConst.REPEAT_MODE) {
-      String groupCode = String.valueOf(event.getGroup().getId());
+      String groupCode = String.valueOf(group.getId());
       // 冷却中直接结束 双校验防并发
       if (redisChatUtils.isRepeatCooling(groupCode)) {
         return;
@@ -145,7 +146,7 @@ public class BotEventHandler extends SimpleListenerHost {
         // 未处于冷却状态
         if (!redisChatUtils.isRepeatCooling(groupCode)) {
           if (msg.equals(prevMsg)) {
-            event.getGroup().sendMessage(msg);   // 复读
+            group.sendMessage(new MessageChainBuilder().append(msg).build());   // 复读
             redisChatUtils.setRepeatCooling(groupCode);   // 设置冷却
             redisChatUtils.setRepeatRecord(groupCode, "");  // 重置上一条聊天记录
           } else {
@@ -168,6 +169,11 @@ public class BotEventHandler extends SimpleListenerHost {
     log.info("【戳一戳】{}({}) {} {}({})", from.getNick(), from.getId(), event.getAction(), target.getNick(), target.getId());
     // 校验是否戳机器人
     if (!botId.equals(target.getId())) {
+      return;
+    }
+
+    // 机器人被禁言中
+    if (redisChatUtils.isBotMuted(groupId)) {
       return;
     }
 
@@ -205,6 +211,24 @@ public class BotEventHandler extends SimpleListenerHost {
     }
   }
 
+  /**
+   * 机器人被禁言事件
+   */
+  @EventHandler
+  public void muteBotEvent(@NotNull BotMuteEvent event) {
+    Group group = event.getGroup();
+    redisChatUtils.setBotMuteState(group.getId(), event.getDurationSeconds());
+  }
+
+  /**
+   * 机器人解除禁言事件
+   */
+  @EventHandler
+  public void unMuteBotEvent(@NotNull BotUnmuteEvent event) {
+    Group group = event.getGroup();
+    redisChatUtils.delBotMuteState(group.getId());
+    group.sendMessage(new MessageChainBuilder().append("好耶！").append(BotConst.NAME).append("复活！").build());
+  }
 
   /**
    * 指令处理
@@ -225,8 +249,9 @@ public class BotEventHandler extends SimpleListenerHost {
           #账号查询@101010101
           #查号@101010101
           #查号2(此指令为B服)@101010101
-          #丘丘语(undone)@gusha
+          #丘丘语(未完成)@gusha
           #每日塔罗
+          #参数配置@key@val@常量标记(可缺省)
 
           小功能：私聊直接发送米游社Cookie可执行米游社的原神自动签到功能
           """);
@@ -268,6 +293,7 @@ public class BotEventHandler extends SimpleListenerHost {
       case QIU_QIU_TRANSLATION -> msgBuilder.append("小奏还没有学会丘丘语翻译呢");
       case RANDOM_SEXY -> handleRandomSexy(groupMsgEvent, msgBuilder, msgArr);
       case DAILY_TAROT -> handleDailyTarot(groupMsgEvent, msgBuilder);
+      case CONFIGURATION -> handleConfiguration(groupMsgEvent, msgBuilder);
       default -> msgBuilder.append("?");
     }
 
@@ -302,7 +328,7 @@ public class BotEventHandler extends SimpleListenerHost {
   private String handleCheckCooling(String code) {
     Long coolTime = redisCertUtils.isRandomImgCooling(code);
     if (null != coolTime) {
-      return "图片功能冷却中！！还剩" + ((coolTime - new Date().getTime()) / 1000) + "秒";
+      return "图片功能冷却中！！还剩" + ((coolTime - System.currentTimeMillis()) / 1000) + "秒";
     }
     return null;
   }
@@ -408,8 +434,6 @@ public class BotEventHandler extends SimpleListenerHost {
         case 0 -> member.mute(CommonUtils.RANDOM.nextInt(541) + 60);
         case 1 -> group.sendMessage("哼, 看在是管理的份上原谅你, 才不是因为禁言不了你呢!");
       }
-      Thread.sleep(3000);
-      member.unmute();
     } catch (Exception e) {
       log.error("【禁言】机器人不在群 {} 中 or 用户 {} 不在群中 or 机器人权限不足, 禁言失败, 堆栈信息: ", null == groupId ? group.getId() : groupId, memberId, e);
     }
@@ -450,6 +474,29 @@ public class BotEventHandler extends SimpleListenerHost {
       }
     }
     return false;
+  }
+
+  /**
+   * 系统参数配置
+   */
+  private void handleConfiguration(GroupMessageEvent event, MessageChainBuilder msgBuilder) {
+    if (!BotConst.QQ.equals(event.getSender().getId())) {
+      msgBuilder.append("再怎么发你也没权限设置的啦~");
+      return;
+    }
+    String[] params = event.getMessage().contentToString().split(SEPARATOR);
+    int length = params.length;
+
+    if (length < 3 || length > 4) {
+      msgBuilder.append("指令有误: #参数配置@key@value@常量标记(可缺省)");
+      return;
+    }
+    systemConfigService.updateVal(params[1], params[2]);
+    if (length == 4) {  // 需要读取配置到常量
+      Map<String, String> mapVal = systemConfigService.getMapVal();
+      BotConfig.setConfig(mapVal);
+    }
+    msgBuilder.append("配置已更新完成，注意测试是否配置成功");
   }
 
 }

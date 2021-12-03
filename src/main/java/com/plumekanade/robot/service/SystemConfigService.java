@@ -33,6 +33,13 @@ public class SystemConfigService extends ServiceImpl<SystemConfigMapper, SystemC
   }
 
   /**
+   * 根据param字段获取对应的对象
+   */
+  public SystemConfig getConfig(String param) {
+    return getOne(new LambdaQueryWrapper<SystemConfig>().eq(SystemConfig::getParam, param));
+  }
+
+  /**
    * 根据param模糊查询val列表
    */
   public List<SystemConfig> getLikeValList(String param) {
@@ -54,4 +61,10 @@ public class SystemConfigService extends ServiceImpl<SystemConfigMapper, SystemC
     });
   }
 
+  /**
+   * 根据param更新对应的val
+   */
+  public void updateVal(String param, String val) {
+    update(new LambdaUpdateWrapper<SystemConfig>().set(SystemConfig::getVal, val).eq(SystemConfig::getParam, param));
+  }
 }
