@@ -47,11 +47,10 @@ public class DynamicTask implements SchedulingConfigurer {
   // 11:00、21:00 发送提醒
   public static String REMIND_CRON = "0 0 12 * * ?";
   public static String SIGN_CRON = "0 0 7 * * ?";
+  public static String GREET_CRON = "0 0 9,12,15,18,21 * * ?";
 
   @Resource
   private Bot bot;
-  @Resource
-  private WxMpService wxMpService;
   @Resource
   private GalleryService galleryService;
   @Resource
@@ -59,23 +58,22 @@ public class DynamicTask implements SchedulingConfigurer {
   @Resource
   private CookieLibService cookieLibService;
   @Resource
-  private MemorandumService memorandumService;
-  @Resource
   private SystemConfigService systemConfigService;
+  @Resource
+  private BotFunctionWordService botFunctionWordService;
 
 
   @Override
   public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
 
-    taskRegistrar.addTriggerTask(this::signTask, triggerContext -> {
-      CronTrigger trigger = new CronTrigger(SIGN_CRON);
-      return trigger.nextExecutionTime(triggerContext);
-    });
+    // 定时签到
+    taskRegistrar.addTriggerTask(this::signTask, context -> new CronTrigger(SIGN_CRON).nextExecutionTime(context));
 
-    taskRegistrar.addTriggerTask(this::remindTask, triggerContext -> {
-      CronTrigger trigger = new CronTrigger(REMIND_CRON);
-      return trigger.nextExecutionTime(triggerContext);
-    });
+    // 定时提醒
+    taskRegistrar.addTriggerTask(this::remindTask, context -> new CronTrigger(REMIND_CRON).nextExecutionTime(context));
+
+    // 定时打招呼
+    taskRegistrar.addTriggerTask(this::greetTask, context -> new CronTrigger(GREET_CRON).nextExecutionTime(context));
   }
 
   /**
@@ -113,9 +111,10 @@ public class DynamicTask implements SchedulingConfigurer {
    */
   public void remindTask() {
     log.info("===============================定时提醒任务启动===============================");
-    Group group = bot.getGroup(Long.parseLong(systemConfigService.getVal(SysKeyConst.LI_YUE)));
+    long liYueId = Long.parseLong(systemConfigService.getVal(SysKeyConst.LI_YUE));
+    Group group = bot.getGroup(liYueId);
     if (null == group) {
-      log.info("【定时提醒】已被移出漓月群聊.....提醒任务结束!");
+      log.info("【定时提醒】已被移出群聊 {}, 提醒任务结束!", liYueId);
       return;
     }
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
@@ -130,11 +129,40 @@ public class DynamicTask implements SchedulingConfigurer {
       group.sendMessage(msgBuilder.build());
 
       // 微信提醒
-      handleWechatTask();
+//      handleWechatTask();
     } catch (Exception e) {
       log.error("【定时提醒】任务异常, 堆栈信息: ", e);
     }
     log.info("===============================定时提醒任务结束===============================");
+  }
+
+  /**
+   * 打招呼
+   */
+  public void greetTask() {
+    int type = 1;
+    long groupId = Long.parseLong(systemConfigService.getVal(SysKeyConst.MU_JIAN));
+    Group group = bot.getGroup(groupId);
+    if (null == group) {
+      log.error("【打招呼】机器人不存在群 {}, 打招呼任务结束!", groupId);
+      return;
+    }
+
+    switch (LocalDateTime.now().getHour()) {
+      case 12 -> type = 2;
+      case 15 -> type = 3;
+      case 18 -> type = 4;
+      case 21 -> type = 5;
+    }
+    List<String> words = botFunctionWordService.getWords(type);
+    String word = words.get(CommonUtils.RANDOM.nextInt(words.size()));
+    MessageChainBuilder msgBuilder = new MessageChainBuilder();
+    if (word.contains(ProjectConst.PNG) || word.contains(ProjectConst.JPG)) {
+      msgBuilder.append(Contact.uploadImage(group, new File(word)));
+    } else {
+      msgBuilder.append(word);
+    }
+    group.sendMessage(word);
   }
 
   /**
@@ -150,9 +178,9 @@ public class DynamicTask implements SchedulingConfigurer {
       long days = hours / 24;
       hours = hours % 24;
       if (days > 0) {
-        extraMsg.append(botTask.getMsg().replace("X", days + "天" + hours + "小时"));
+        extraMsg.append(botTask.getMsg().replace(ProjectConst.REPLACE_CHAR, days + "天" + hours + "小时"));
       } else {    // 即将结束
-        extraMsg.append(botTask.getMsg().replace("X", hours + "小时"));
+        extraMsg.append(botTask.getMsg().replace(ProjectConst.REPLACE_CHAR, hours + "小时"));
         botTask.setState(ProjectConst.ZERO);
         botTaskService.updateById(botTask);
       }
@@ -171,28 +199,6 @@ public class DynamicTask implements SchedulingConfigurer {
       return "微博和";
     }
     return "";
-  }
-
-  /**
-   * 处理微信提醒
-   */
-  public void handleWechatTask() {
-    List<Memorandum> list = memorandumService.list(new LambdaQueryWrapper<Memorandum>().eq(Memorandum::getState, 1));
-    StringBuilder builder = new StringBuilder();
-    if (list.size() > 0) {
-      for (Memorandum memorandum : list) {
-        builder.append(memorandum.getTitle()).append("\t - \t").append(memorandum.getContent()).append(ProjectConst.WRAP);
-      }
-      WxMpKefuMessage message = WxMpKefuMessage.TEXT()
-          .toUser(systemConfigService.getVal(SysKeyConst.OPENID))
-          .content(builder.substring(0, builder.length() - 1))
-          .build();
-      try {
-        wxMpService.getKefuService().sendKefuMessage(message);
-      } catch (WxErrorException e) {
-        log.error("【微信客服提醒】发送客服消息提醒失败, 堆栈信息: ", e);
-      }
-    }
   }
 
 }

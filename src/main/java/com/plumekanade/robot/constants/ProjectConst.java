@@ -51,6 +51,9 @@ public class ProjectConst {
   public static final String ZERO = "0";
   public static final String RELEASE = "release";
   public static final String FORBID_WORD = "立华奏橘奏立華 かなでたちばな かなでTachibalaKanade天使的心跳AngelBeatsangelbeatsab";
+  public static final String PNG = "png";
+  public static final String JPG = "jpg";
+  public static final String REPLACE_CHAR = "X";
 
   // 请求类型
   public static final String CONTENT_TYPE = "Content-Type";

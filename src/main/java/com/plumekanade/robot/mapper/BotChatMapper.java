@@ -15,10 +15,4 @@ import java.util.List;
 @Repository
 public interface BotChatMapper extends BaseMapper<BotChat> {
 
-  /**
-   * 获取回复被戳一戳的语句列表
-   */
-  @Select("select reply from bot_chat where dic_type = 0")
-  List<String> getNudges();
-
 }

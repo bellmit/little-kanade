@@ -38,14 +38,13 @@ import static com.plumekanade.robot.constants.CmdConst.*;
 public class BotEventHandler extends SimpleListenerHost {
 
   private final TarotService tarotService;
-  private final BotDicService botDicService;
-  private final BotChatService botChatService;
   private final RedisCertUtils redisCertUtils;
   private final RedisChatUtils redisChatUtils;
   private final GalleryService galleryService;
   private final CookieLibService cookieLibService;
   private final GroupConfigService groupConfigService;
   private final SystemConfigService systemConfigService;
+  private final BotFunctionWordService botFunctionWordService;
 
   /**
    * 处理私聊消息
@@ -97,26 +96,36 @@ public class BotEventHandler extends SimpleListenerHost {
   @EventHandler
   private void handleGroupMsg(@NotNull GroupMessageEvent event) {
     Group group = event.getGroup();
-    // 机器人被禁言中
-    if (group.getBotMuteRemaining() > 0) {
-      return;
-    }
-
+    long senderId = event.getSender().getId();
     String msg = event.getMessage().serializeToMiraiCode();
-    log.info("【群消息】收到 {} - {}({}) 的消息: {}", group.getName(), event.getSenderName(), event.getSender().getId(), msg);
+    log.info("【群消息】收到 {} - {}({}) 的消息: {}", group.getName(), event.getSenderName(), senderId, msg);
 
-    // 生气了吗.jpg
-    boolean isAngry = checkBotAngry(group.getId(), null);
-    if (isAngry) {
+    boolean isAngry = checkBotAngry(group.getId(), senderId);
+    // 生气了吗.jpg         机器人被禁言中
+    if (isAngry || group.getBotMuteRemaining() > 0) {
       return;
     }
 
     // 取消生气状态
-    if (isAngry && msg.contains(BotConst.NAME)) {
+    if (BotConst.QQ.equals(senderId) && isAngry && msg.contains(BotConst.NAME)) {
+      boolean flg = false;
       for (String word : BotConst.CANCEL_ANGRY) {
         if (msg.contains(word)) {
           redisChatUtils.cancelAngry(group.getId());
+          flg = true;
+          List<String> words = botFunctionWordService.getWords(6);
+          word = words.get(CommonUtils.RANDOM.nextInt(words.size())).replace(ProjectConst.REPLACE_CHAR, BotConst.NAME);
+          MessageChainBuilder msgBuilder = new MessageChainBuilder();
+          if (word.contains(ProjectConst.PNG) || word.contains(ProjectConst.JPG)) {
+            msgBuilder.append(Contact.uploadImage(group, new File(word)));
+          } else {
+            msgBuilder.append(word);
+          }
+          group.sendMessage(msgBuilder.build());
         }
+      }
+      if (flg) {
+        return;
       }
     }
 
@@ -166,22 +175,13 @@ public class BotEventHandler extends SimpleListenerHost {
     UserOrBot target = event.getTarget();
     long groupId = event.getSubject().getId();
     log.info("【戳一戳】{}({}) {} {}({})", from.getNick(), from.getId(), event.getAction(), target.getNick(), target.getId());
-    // 校验是否戳机器人
-    if (!botId.equals(target.getId())) {
+
+    //         校验是否戳机器人                          生气了吗.jpg                         机器人被禁言中
+    if (!botId.equals(target.getId()) || checkBotAngry(groupId, from.getId()) || redisChatUtils.isBotMuted(groupId)) {
       return;
     }
 
-    // 机器人被禁言中
-    if (redisChatUtils.isBotMuted(groupId)) {
-      return;
-    }
-
-    // 生气了吗.jpg
-    if (checkBotAngry(groupId, from.getId())) {
-      return;
-    }
-
-    List<String> replyList = botChatService.getNudges();
+    List<String> replyList = botFunctionWordService.getWords(0);
     int size = replyList.size();
     int i = CommonUtils.RANDOM.nextInt(size + 2);
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
@@ -454,16 +454,17 @@ public class BotEventHandler extends SimpleListenerHost {
 
   /**
    * 校验机器人是否生气
-   * @param nudgeFromId 戳一戳的来源方
+   *
+   * @param memberId 戳一戳的来源方/群聊消息的发送方
    */
-  public boolean checkBotAngry(Long groupId, Long nudgeFromId) {
+  public boolean checkBotAngry(Long groupId, Long memberId) {
     String angryFlag = redisChatUtils.getWillAngryFlag(groupId);
     // 校验机器人生气状态
-    if (!BotConst.QQ.equals(nudgeFromId)) {
+    if (!BotConst.QQ.equals(memberId)) {
       if (ProjectConst.ONE.equals(angryFlag)) {  // 已经生气
         return true;
       }
-      if (null != nudgeFromId && ProjectConst.ZERO.equals(angryFlag)) { // 开始生气 不再处理戳一戳
+      if (null != memberId && ProjectConst.ZERO.equals(angryFlag)) { // 开始生气 不再处理戳一戳
         redisChatUtils.setAngry(groupId);
         Group group = BotConst.BOT.getGroup(groupId);
         MessageChainBuilder builder = new MessageChainBuilder().append("生气气！")

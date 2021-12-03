@@ -187,7 +187,7 @@ public class WechatMsgHandler implements WxMpMessageHandler {
           long days = hours / 24;
           hours = hours % 24;
           String text = days > 0 ? days + "天" + hours + "小时" : hours + "小时";
-          String demo = botTask.getMsg().replace("X", text);
+          String demo = botTask.getMsg().replace(ProjectConst.REPLACE_CHAR, text);
           content = "已设置签到提醒额外消息: " + demo;
         }
         case TASK_LIST -> {
