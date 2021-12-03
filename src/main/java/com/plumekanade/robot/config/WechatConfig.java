@@ -1,6 +1,6 @@
 package com.plumekanade.robot.config;
 
-import com.plumekanade.robot.entity.SystemConfig;
+import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.handler.WechatMsgHandler;
 import com.plumekanade.robot.handler.WechatScanHandler;
 import com.plumekanade.robot.service.SystemConfigService;
@@ -17,7 +17,7 @@ import redis.clients.jedis.JedisPool;
 
 import javax.annotation.Resource;
 
-import java.util.List;
+import java.util.Map;
 
 import static me.chanjar.weixin.common.api.WxConsts.XmlMsgType.EVENT;
 
@@ -35,6 +35,8 @@ public class WechatConfig {
   private final SystemConfigService systemConfigService;
 
   private static final String WECHAT = "wechat";
+  public static String OPEN_ID;
+  public static String ORIGIN_ID;
 
   @Resource(name = "redisZero")
   private JedisPool zero;
@@ -47,13 +49,15 @@ public class WechatConfig {
 
   @Bean
   public WxMpService wxMpService() {
-    List<SystemConfig> list = systemConfigService.getLikeValList("wx");
+    Map<String, String> wxMapVal = systemConfigService.getMapVal("wx");
+    OPEN_ID = wxMapVal.get(SysKeyConst.OPENID);
+    ORIGIN_ID = wxMapVal.get(SysKeyConst.WX_ORIGIN_ID);
     WxMpService service = new WxMpServiceImpl();
     WxMpDefaultConfigImpl configStorage = new WxMpRedisConfigImpl(new JedisWxRedisOps(zero), WECHAT);
-    configStorage.setAppId(list.get(0).getVal());
-    configStorage.setSecret(list.get(1).getVal());
-    configStorage.setToken(list.get(2).getVal());
-    configStorage.setAesKey(list.get(3).getVal());
+    configStorage.setAppId(wxMapVal.get(SysKeyConst.WX_APP_ID));
+    configStorage.setSecret(wxMapVal.get(SysKeyConst.WX_APP_SECRET));
+    configStorage.setToken(wxMapVal.get(SysKeyConst.WX_APP_TOKEN));
+    configStorage.setAesKey(wxMapVal.get(SysKeyConst.WX_AES_KEY));
     service.setWxMpConfigStorage(configStorage);
     return service;
   }

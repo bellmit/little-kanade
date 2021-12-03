@@ -37,15 +37,11 @@ public class Memorandum implements Serializable {
   public Memorandum(String title, String content, Date remindTime) {
     this.title = title;
     this.content = content;
-    this.remindTime = remindTime;
-    this.remindFlg = true;
-    this.state = 1;
+    if (null != remindTime) {
+      this.remindTime = remindTime;
+      this.remindFlg = true;
+      this.state = 1;
+    }
   }
 
-  public Memorandum(String title, String content) {
-    this.title = title;
-    this.content = content;
-    this.remindFlg = false;
-    this.state = 0;
-  }
 }

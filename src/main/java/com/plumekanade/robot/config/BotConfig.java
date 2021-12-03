@@ -15,9 +15,11 @@ import net.mamoe.mirai.utils.BotConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.annotation.Resource;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Map;
+
 
 /**
  * @author kanade
@@ -36,7 +38,7 @@ public class BotConfig {
    */
   @Bean
   public Bot bot() {
-    Map<String, String> mapVal = systemConfigService.getMapVal();
+    Map<String, String> mapVal = systemConfigService.getMapVal(null);
     setConfig(mapVal);  // 配置写入
 
     // 默认只取一个 后面有需要再改多个
@@ -73,9 +75,10 @@ public class BotConfig {
    * 配置写入
    */
   public static void setConfig(Map<String, String> mapVal) {
-    BotConst.QQ = Long.parseLong(mapVal.get(SysKeyConst.QQ));
+
     BotConst.NAME = mapVal.get(SysKeyConst.BOT_NAME);
     MiHoYoUtils.COOKIE = mapVal.get(SysKeyConst.MHY_COOKIE);
+    BotConst.QQ = Long.parseLong(mapVal.get(SysKeyConst.QQ));
     BotConst.REPEAT_MODE = ProjectConst.ONE.equals(mapVal.get(SysKeyConst.REPEAT_MODE));
     BotConst.CANCEL_ANGRY = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.CANCEL_ANGRY).split(ProjectConst.COMMA)));
     BotConst.AWAKE_KEYWORD = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.AWAKE_KEYWORD).split(ProjectConst.COMMA)));

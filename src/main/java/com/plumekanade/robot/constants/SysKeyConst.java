@@ -15,7 +15,7 @@ public class SysKeyConst {
   public static final String BOT_NAME = "botName";
   public static final String BOT_AUTH = "botAuth";
   public static final String QQ = "qq";
-  public static final String OPENID = "openid";
+  public static final String OPENID = "wxOpenid";
   public static final String MHY_COOKIE = "mhyCookie";
   public static final String WX_APP_ID = "wxAppId";
   public static final String WX_APP_SECRET = "wxAppSecret";

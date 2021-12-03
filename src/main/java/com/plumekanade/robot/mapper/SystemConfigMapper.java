@@ -1,7 +1,10 @@
 package com.plumekanade.robot.mapper;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.plumekanade.robot.entity.SystemConfig;
+import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.annotations.Select;
 import org.springframework.stereotype.Repository;
 
@@ -17,6 +20,7 @@ public interface SystemConfigMapper extends BaseMapper<SystemConfig> {
    * 获取所有配置 以param的值作为val的键名组成JSON字符串
    */
   @Select("""
-      select group_concat(concat('"', param, '":"', val, '"')) as json from system_config order by id""")
-  String getMapVal();
+      select group_concat(concat('"', param, '":"', val, '"')) as json from system_config ${ew.customSqlSegment}
+      """)
+  String getMapVal(@Param(Constants.WRAPPER) Wrapper<SystemConfig> wrapper);
 }

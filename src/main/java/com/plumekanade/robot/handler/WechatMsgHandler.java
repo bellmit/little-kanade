@@ -117,10 +117,10 @@ public class WechatMsgHandler implements WxMpMessageHandler {
           } else if (2 == msgArr.length) {    // 查询指定标题(模糊)备忘录
             wrapper.like(Memorandum::getTitle, targetName);
             content = handleMemorandum(memorandumService.list(wrapper));
-          } else if (3 == msgArr.length) {    // 添加不需要提醒的备忘录
-            memorandumService.save(new Memorandum(targetName, msgArr[2]));
-          } else {    // 添加需要提醒的备忘录
-            memorandumService.save(new Memorandum(targetName, msgArr[2], DateConst.SDF.parse(msgArr[3])));
+          } else if (3 == msgArr.length) {    // 添加/更新不需要提醒的备忘录
+            memorandumService.saveOrUpdateByTitle(targetName, msgArr[2], null);
+          } else {    // 添加/更新需要提醒的备忘录
+            memorandumService.saveOrUpdateByTitle(targetName, msgArr[2], DateConst.SDF.parse(msgArr[3]));
           }
         }
         case ANIME -> {

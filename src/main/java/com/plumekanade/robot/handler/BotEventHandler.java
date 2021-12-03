@@ -5,7 +5,6 @@ import com.plumekanade.robot.config.BotConfig;
 import com.plumekanade.robot.constants.BotConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.CookieLib;
-import com.plumekanade.robot.entity.SystemConfig;
 import com.plumekanade.robot.entity.Tarot;
 import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.*;
@@ -493,7 +492,7 @@ public class BotEventHandler extends SimpleListenerHost {
     }
     systemConfigService.updateVal(params[1], params[2]);
     if (length == 4) {  // 需要读取配置到常量
-      Map<String, String> mapVal = systemConfigService.getMapVal();
+      Map<String, String> mapVal = systemConfigService.getMapVal(null);
       BotConfig.setConfig(mapVal);
     }
     msgBuilder.append("配置已更新完成，注意测试是否配置成功");

@@ -2,6 +2,7 @@ package com.plumekanade.robot.service;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.plumekanade.robot.entity.SystemConfig;
@@ -14,9 +15,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- *
- * @version 1.0
  * @author kanade
+ * @version 1.0
  * @date 2021-11-27 15:10:38
  */
 @Service
@@ -56,8 +56,12 @@ public class SystemConfigService extends ServiceImpl<SystemConfigMapper, SystemC
   /**
    * 获取所有配置 以param的值作为val的键名
    */
-  public Map<String, String> getMapVal() {
-    return MapperUtils.deserialize("{" + systemConfigMapper.getMapVal() + "}", new TypeReference<Map<String, String>>() {
+  public Map<String, String> getMapVal(String query) {
+    LambdaQueryWrapper<SystemConfig> wrapper = new LambdaQueryWrapper<>();
+    if (StringUtils.isNotBlank(query)) {
+      wrapper.like(SystemConfig::getParam, query);
+    }
+    return MapperUtils.deserialize("{" + systemConfigMapper.getMapVal(wrapper) + "}", new TypeReference<>() {
     });
   }
 
