@@ -21,7 +21,7 @@ public class BotFunctionWord implements Serializable {
 
   @TableId(type = IdType.AUTO)
   private Long id;
-  // 语句类型 0戳一戳回复 1早上打招呼 2中午打招呼 3下午打招呼 4傍晚打招呼 5晚上打招呼
+  // 语句类型 0戳一戳回复 1早上打招呼 2中午打招呼 3下午打招呼 4傍晚打招呼 5晚上打招呼 6取消生气状态的回复 7被@或回复的响应
   private Integer type;
   // 语句
   private String word;

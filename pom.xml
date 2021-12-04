@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.plumekanade</groupId>
     <artifactId>little-kanade</artifactId>
-    <version>0.0.1-beta</version>
+    <version>1.0.0</version>
     <name>little-kanade</name>
     <description>小奏机器人项目</description>
     <properties>

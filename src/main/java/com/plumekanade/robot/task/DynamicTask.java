@@ -6,6 +6,7 @@ import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.BotTask;
 import com.plumekanade.robot.entity.CookieLib;
 import com.plumekanade.robot.entity.Memorandum;
+import com.plumekanade.robot.handler.BotEventHandler;
 import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.CommonUtils;
 import com.plumekanade.robot.utils.MiHoYoUtils;
@@ -155,14 +156,9 @@ public class DynamicTask implements SchedulingConfigurer {
       case 21 -> type = 5;
     }
     List<String> words = botFunctionWordService.getWords(type);
-    String word = words.get(CommonUtils.RANDOM.nextInt(words.size()));
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
-    if (word.contains(ProjectConst.PNG) || word.contains(ProjectConst.JPG)) {
-      msgBuilder.append(Contact.uploadImage(group, new File(word)));
-    } else {
-      msgBuilder.append(word);
-    }
-    group.sendMessage(word);
+    BotEventHandler.checkImgMsg(words.get(CommonUtils.RANDOM.nextInt(words.size())), group, msgBuilder);
+    group.sendMessage(msgBuilder.build());
   }
 
   /**

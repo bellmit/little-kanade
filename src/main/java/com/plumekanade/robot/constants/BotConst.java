@@ -30,4 +30,7 @@ public class BotConst {
   public static final String WILL_ANGRY = "再戳就要生气了！";
   public static final String IS_ANGRY = "生气了";
 
+  // mirai码字符串
+  public static final String AT = "[mirai:at:";
+
 }
