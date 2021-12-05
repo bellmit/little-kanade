@@ -243,11 +243,10 @@ public class BotEventHandler extends SimpleListenerHost {
    *
    * @date 2021-08-24 16:04
    */
-  private void handleCmd(GroupMessageEvent groupMsgEvent, String msgText, MessageChainBuilder msgBuilder) {
-    Member sender = groupMsgEvent.getSender();
-    Group group = groupMsgEvent.getGroup();
+  private void handleCmd(GroupMessageEvent event, String msgText, MessageChainBuilder msgBuilder) {
+    Member sender = event.getSender();
+    Group group = event.getGroup();
     String[] msgArr = msgText.split(SEPARATOR);
-
     switch (msgArr[0]) {
       // 指令列表
       case CMD_LIST -> msgBuilder.append("""
@@ -298,20 +297,24 @@ public class BotEventHandler extends SimpleListenerHost {
         }
       }
       case QIU_QIU_TRANSLATION -> msgBuilder.append("小奏还没有学会丘丘语翻译呢");
-      case RANDOM_SEXY -> handleRandomSexy(groupMsgEvent, msgBuilder, msgArr);
-      case DAILY_TAROT -> handleDailyTarot(groupMsgEvent, msgBuilder);
-      case CONFIGURATION -> handleConfiguration(groupMsgEvent, msgBuilder);
+      case RANDOM_SEXY -> handleRandomSexy(event, msgBuilder, msgArr);
+      case DAILY_TAROT -> handleDailyTarot(event, msgBuilder);
+      case CONFIGURATION -> handleConfiguration(event, msgBuilder);
       case LITTLE_BLACK_HOUSE -> {    // 关小黑屋
-        if (!BotConst.QQ.equals(sender.getId()) && sender.getPermission().getLevel() == 0) {
-          sender.mute(10);    // 禁言10s
-          msgBuilder.append(new PlainText("你在教我做事？"));
-        } else {
-          String muteId = msgArr[1].split(BotConst.AT_END)[0].split(BotConst.AT)[1];
-          if (StringUtils.isNotBlank(muteId) && msgArr.length >= 3) {
-            group.get(Long.parseLong(muteId)).mute(Integer.parseInt(msgArr[2]) * 60);
+        try {
+          if (!BotConst.QQ.equals(sender.getId()) && sender.getPermission().getLevel() == 0) {
+            sender.mute(10);    // 禁言10s
+            msgBuilder.append(new PlainText("你在教我做事？"));
+          } else {
+            String muteId = msgArr[1].split(BotConst.AT_END)[0].replace(BotConst.AT, "");
+            if (StringUtils.isNotBlank(muteId) && msgArr.length >= 3) {
+              group.get(Long.parseLong(muteId)).mute(Integer.parseInt(msgArr[2]) * 60);
+            }
           }
+          msgBuilder.append(Contact.uploadImage(group, new File(BotConst.IMG_GS)));
+        } catch (Exception e) {
+          e.printStackTrace();
         }
-        msgBuilder.append(Contact.uploadImage(group, new File(BotConst.IMG_GS)));
       }
       default -> msgBuilder.append("?");
     }
