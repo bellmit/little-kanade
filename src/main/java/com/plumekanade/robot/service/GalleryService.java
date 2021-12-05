@@ -57,8 +57,7 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
       for (File file : files) {
         // 是文件且不在数据库
         if (file.isFile() && !names.contains(file.getName())) {
-          insertList.add(new Gallery(file.getName(), file.getName(), sexyState, file.getPath(),
-              galleryUrl + file.getName(), ImageHashUtils.getHash(file)));
+          insertList.add(new Gallery(file.getName(), file.getName(), sexyState, file.getPath(), galleryUrl + file.getName()));
         }
       }
       saveBatch(insertList);
@@ -85,8 +84,5 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
 
     Gallery gallery = page(new Page<>(page, 10), wrapper).getRecords().get((int) idx);
     return gallery.getPath();
-
-//    Gallery gallery = galleryMapper.randomImg(sexyState);
-//    return gallery.getPath();
   }
 }

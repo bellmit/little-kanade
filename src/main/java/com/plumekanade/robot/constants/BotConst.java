@@ -32,5 +32,9 @@ public class BotConst {
 
   // mirai码字符串
   public static final String AT = "[mirai:at:";
+  public static final String AT_END = "]";
+
+  // 部分静态图片地址
+  public static final String IMG_GS = "/home/littleKanade/imgSource/gaoshi.png";
 
 }

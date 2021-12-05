@@ -3,6 +3,7 @@ package com.plumekanade.robot.handler;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.plumekanade.robot.config.BotConfig;
 import com.plumekanade.robot.constants.BotConst;
+import com.plumekanade.robot.constants.CmdConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.CookieLib;
 import com.plumekanade.robot.entity.Tarot;
@@ -39,6 +40,8 @@ import static com.plumekanade.robot.constants.CmdConst.*;
 public class BotEventHandler extends SimpleListenerHost {
 
   private final TarotService tarotService;
+  private final BotDicService botDicService;
+  private final BotChatService botChatService;
   private final RedisCertUtils redisCertUtils;
   private final RedisChatUtils redisChatUtils;
   private final GalleryService galleryService;
@@ -91,13 +94,11 @@ public class BotEventHandler extends SimpleListenerHost {
     Group group = event.getGroup();
     long senderId = event.getSender().getId();
     String msg = event.getMessage().serializeToMiraiCode();
+    MessageChainBuilder msgBuilder = new MessageChainBuilder();
     log.info("【群消息】收到 {} - {}({}) 的消息: {}", group.getName(), event.getSenderName(), senderId, msg);
 
-    boolean isAngry = checkBotAngry(group.getId(), senderId, false);
-
-    // 取消生气状态
-    MessageChainBuilder msgBuilder = new MessageChainBuilder();
-    if (BotConst.QQ.equals(senderId) && isAngry && msg.contains(BotConst.NAME)) {
+    // 取消生气状态   是否主人                        不传入发送人直接查                         是否包含机器人名称
+    if (BotConst.QQ.equals(senderId) && checkBotAngry(group.getId(), null, false) && msg.contains(BotConst.NAME)) {
       boolean flg = false;
       for (String word : BotConst.CANCEL_ANGRY) {
         if (msg.contains(word)) {
@@ -114,15 +115,14 @@ public class BotEventHandler extends SimpleListenerHost {
     }
 
     // 生气了吗.jpg         机器人被禁言中
-    if (isAngry || group.getBotMuteRemaining() > 0) {
+    if (checkBotAngry(group.getId(), senderId, false) || group.getBotMuteRemaining() > 0) {
       return;
     }
 
     // @/回复机器人
     if (msg.contains(BotConst.AT + BotConst.BOT.getId())) {
-      List<String> words = botFunctionWordService.getWords(7);
-      checkImgMsg(words.get(CommonUtils.RANDOM.nextInt(words.size())), group, msgBuilder);
-      group.sendMessage(msgBuilder.build());
+      msgBuilder.append(new At(senderId));
+      handleAt(group, msg, msgBuilder);
       return;
     }
 
@@ -210,7 +210,7 @@ public class BotEventHandler extends SimpleListenerHost {
    * 机器人被禁言事件
    */
   @EventHandler
-  public void muteBotEvent(@NotNull BotMuteEvent event) {
+  private void muteBotEvent(@NotNull BotMuteEvent event) {
     Group group = event.getGroup();
     redisChatUtils.setBotMuteState(group.getId(), event.getDurationSeconds());
   }
@@ -219,10 +219,23 @@ public class BotEventHandler extends SimpleListenerHost {
    * 机器人解除禁言事件
    */
   @EventHandler
-  public void unMuteBotEvent(@NotNull BotUnmuteEvent event) {
+  private void unMuteBotEvent(@NotNull BotUnmuteEvent event) {
     Group group = event.getGroup();
     redisChatUtils.delBotMuteState(group.getId());
     group.sendMessage(new MessageChainBuilder().append("好耶！").append(BotConst.NAME).append("复活！").build());
+  }
+
+  /**
+   * 机器人被@处理
+   */
+  private void handleAt(Group group, String msg, MessageChainBuilder msgBuilder) {
+    String reply = botDicService.queryTypeToGetWord(msg);
+    if (null == reply) {
+      List<String> words = botFunctionWordService.getWords(7);
+      reply = words.get(CommonUtils.RANDOM.nextInt(words.size()));
+    }
+    checkImgMsg(reply, group, msgBuilder);
+    group.sendMessage(msgBuilder.build());
   }
 
   /**
@@ -288,6 +301,18 @@ public class BotEventHandler extends SimpleListenerHost {
       case RANDOM_SEXY -> handleRandomSexy(groupMsgEvent, msgBuilder, msgArr);
       case DAILY_TAROT -> handleDailyTarot(groupMsgEvent, msgBuilder);
       case CONFIGURATION -> handleConfiguration(groupMsgEvent, msgBuilder);
+      case LITTLE_BLACK_HOUSE -> {    // 关小黑屋
+        if (!BotConst.QQ.equals(sender.getId()) && sender.getPermission().getLevel() == 0) {
+          sender.mute(10);    // 禁言10s
+          msgBuilder.append(new PlainText("你在教我做事？"));
+        } else {
+          String muteId = msgArr[1].split(BotConst.AT_END)[0].split(BotConst.AT)[1];
+          if (StringUtils.isNotBlank(muteId) && msgArr.length >= 3) {
+            group.get(Long.parseLong(muteId)).mute(Integer.parseInt(msgArr[2]) * 60);
+          }
+        }
+        msgBuilder.append(Contact.uploadImage(group, new File(BotConst.IMG_GS)));
+      }
       default -> msgBuilder.append("?");
     }
 
@@ -418,7 +443,7 @@ public class BotEventHandler extends SimpleListenerHost {
   /**
    * 传入群号/群对象禁言某群员
    */
-  public void mute(Group group, Long groupId, Long memberId, String originMsg) {
+  private void mute(Group group, Long groupId, Long memberId, String originMsg) {
     try {
       NormalMember member = (group = group == null ? BotConst.BOT.getGroup(groupId) : group).get(memberId);
       MessageChainBuilder msgBuilder = new MessageChainBuilder();
@@ -453,7 +478,7 @@ public class BotEventHandler extends SimpleListenerHost {
    *
    * @param memberId 戳一戳的来源方/群聊消息的发送方
    */
-  public boolean checkBotAngry(Long groupId, Long memberId, boolean isNudge) {
+  private boolean checkBotAngry(Long groupId, Long memberId, boolean isNudge) {
     try {
       String angryFlag = redisChatUtils.getWillAngryFlag(groupId);
       // 校验机器人生气状态

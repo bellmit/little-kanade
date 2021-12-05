@@ -48,7 +48,7 @@ public class DynamicTask implements SchedulingConfigurer {
   // 11:00、21:00 发送提醒
   public static String REMIND_CRON = "0 0 12 * * ?";
   public static String SIGN_CRON = "0 0 7 * * ?";
-  public static String GREET_CRON = "0 0 9,12,15,18,21 * * ?";
+  public static String GREET_CRON = "0 0 9,15,18,21 * * ?";
 
   @Resource
   private Bot bot;
@@ -112,27 +112,32 @@ public class DynamicTask implements SchedulingConfigurer {
    */
   public void remindTask() {
     log.info("===============================定时提醒任务启动===============================");
-    long liYueId = Long.parseLong(systemConfigService.getVal(SysKeyConst.LI_YUE));
-    Group group = bot.getGroup(liYueId);
-    if (null == group) {
-      log.info("【定时提醒】已被移出群聊 {}, 提醒任务结束!", liYueId);
-      return;
-    }
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
-    try {
-      int[] time = CommonUtils.getSpiralAbyssSurplusDays();
-      msgBuilder.append(new PlainText(handleWeiboMsg() + "米游社该签到了。\n距离深渊刷新还有" + time[0] + "天" + time[1] + "小时\n" + handleExtraMsg()));
-      if (Boolean.parseBoolean(systemConfigService.getVal(SysKeyConst.REMIND_IMG))) {
-        int sexy = Integer.parseInt(systemConfigService.getVal(SysKeyConst.REMIND_IMG_SEXY));
-        msgBuilder.append(Contact.uploadImage(group, new File(galleryService.randomImg(sexy))));
-      }
-      log.info("【定时提醒】消息内容: " + msgBuilder);
-      group.sendMessage(msgBuilder.build());
+    int[] time = CommonUtils.getSpiralAbyssSurplusDays();
+    msgBuilder.append(new PlainText(handleWeiboMsg() + "米游社该签到了。\n距离深渊刷新还有" + time[0] + "天" + time[1] + "小时\n" + handleExtraMsg()));
+    File img = null;
+    if (Boolean.parseBoolean(systemConfigService.getVal(SysKeyConst.REMIND_IMG))) {
+      img = new File(galleryService.randomImg(Integer.parseInt(systemConfigService.getVal(SysKeyConst.REMIND_IMG_SEXY))));
+    }
+    log.info("【定时提醒】消息内容: " + msgBuilder);
 
-      // 微信提醒
-//      handleWechatTask();
-    } catch (Exception e) {
-      log.error("【定时提醒】任务异常, 堆栈信息: ", e);
+    String groupIds = systemConfigService.getVal(SysKeyConst.REMIND_GROUP);
+    boolean imgAdded = false;
+    for (String groupId : groupIds.split(ProjectConst.COMMA)) {
+      Group group = bot.getGroup(Long.parseLong(groupId));
+      if (null == group) {
+        log.info("【定时提醒】已被移出群聊 {}, 提醒任务结束!", groupId);
+        return;
+      }
+      try {
+        if (!imgAdded && null != img && img.exists()) {
+          msgBuilder.append(Contact.uploadImage(group, img));
+          imgAdded = true;
+        }
+        group.sendMessage(msgBuilder.build());
+      } catch (Exception e) {
+        log.error("【定时提醒】任务异常, 堆栈信息: ", e);
+      }
     }
     log.info("===============================定时提醒任务结束===============================");
   }
@@ -150,7 +155,7 @@ public class DynamicTask implements SchedulingConfigurer {
     }
 
     switch (LocalDateTime.now().getHour()) {
-      case 12 -> type = 2;
+//      case 12 -> type = 2;
       case 15 -> type = 3;
       case 18 -> type = 4;
       case 21 -> type = 5;

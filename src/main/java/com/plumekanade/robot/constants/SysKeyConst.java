@@ -25,7 +25,7 @@ public class SysKeyConst {
   public static final String TENCENT_API_APP_ID = "tencentApiAppId";
   public static final String TENCENT_API_SECRET_ID = "tencentApiSecretId";
   public static final String TENCENT_API_SECRET_KEY = "tencentApiSecretKey";
-  public static final String LI_YUE = "liYue";
+  public static final String REMIND_GROUP = "remindGroup";
   public static final String MU_JIAN = "muJian";
   public static final String REMIND_IMG = "remindImg";
   public static final String REMIND_IMG_SEXY = "remindImgSexy";
