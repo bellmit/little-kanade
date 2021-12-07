@@ -18,6 +18,7 @@ public class CmdConst {
   public static final String DAILY_TAROT = "每日塔罗";
   public static final String CONFIGURATION = "参数配置";
   public static final String LITTLE_BLACK_HOUSE = "小黑屋";
+  public static final String NO_MOLE = "无内鬼";
 
   // 指令/参数分隔符
   public static final String SEPARATOR = "@";

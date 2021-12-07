@@ -297,6 +297,7 @@ public class BotEventHandler extends SimpleListenerHost {
       }
       case QIU_QIU_TRANSLATION -> msgBuilder.append("小奏还没有学会丘丘语翻译呢");
       case RANDOM_SEXY -> handleRandomSexy(event, msgBuilder, msgArr);
+      case NO_MOLE -> handleR18(event, msgBuilder, msgArr);
       case DAILY_TAROT -> handleDailyTarot(event, msgBuilder);
       case CONFIGURATION -> handleConfiguration(event, msgBuilder);
       case LITTLE_BLACK_HOUSE -> {    // 关小黑屋
@@ -355,7 +356,7 @@ public class BotEventHandler extends SimpleListenerHost {
   }
 
   /**
-   * 随机涩图处理逻辑
+   * 随机涩图处理逻辑 无R18
    */
   private void handleRandomSexy(GroupMessageEvent groupMsgEvent, MessageChainBuilder builder, String[] msgArr) {
     Long memberCode = groupMsgEvent.getSender().getId();
@@ -376,7 +377,6 @@ public class BotEventHandler extends SimpleListenerHost {
           return;
         }
       }
-      boolean cdFlag = true;
 
       // 校验禁止词
       boolean forbid = false;
@@ -391,40 +391,43 @@ public class BotEventHandler extends SimpleListenerHost {
         return;
       }
 
-      boolean sexyLvFlag = msgArr.length >= 2 && ProjectConst.ONE.equals(msgArr[1]);
-      if (sexyLvFlag && !BotConst.QQ.equals(memberCode)) {
-        builder.append("不可以这样哦~");
-        cdFlag = false;
-      } else {
-        List<String> params = new ArrayList<>(Arrays.asList(msgArr));
-        params.remove(0);
-        if (sexyLvFlag) {
-          params.remove(1);
-        }
-        List<LoLiConResult> results = ServletUtils.handleLoLiConReq(MapperUtils.serialize(new LoLiConReq(sexyLvFlag ? 1 : 0, 1, params)));
-        if (results.size() > 0) {
-          LoLiConResult loLiConResult = results.get(0);
-          try {
-            String url = loLiConResult.getUrls().getRegular();
-            if (StringUtils.isBlank(url)) {
-              url = loLiConResult.getUrls().getOriginal();
-            }
-            InputStream is = Objects.requireNonNull(ServletUtils.get(url)).getContent();
-            builder.append(Contact.uploadImage(groupMsgEvent.getGroup(), is)).append(ProjectConst.WRAP)
-                .append("作者：").append(loLiConResult.getAuthor()).append(" - ").append(loLiConResult.getPid().toString());
-          } catch (Exception e) {
-            log.error("【随机涩图】获取涩图出现异常, 堆栈信息: ", e);
-            builder.append("涩涩大失败！接口异常，请联系主人处理吧~~");
-          }
-        } else {
-          builder.append("再怎么找也找不到的啦，换一张吧");
-          cdFlag = false;
-        }
+
+      List<String> params = new ArrayList<>(Arrays.asList(msgArr));
+      params.remove(0);
+      List<LoLiConResult> results = ServletUtils.handleLoLiConReq(MapperUtils.serialize(new LoLiConReq(0, 1, params)));
+      if (results.size() <= 0) {
+        builder.append("再怎么找也找不到的啦，换一张吧");
+        return;
       }
-      if (cdFlag && !BotConst.QQ.equals(memberCode)) {
+
+      LoLiConResult loLiConResult = results.get(0);
+      try {
+        String url = loLiConResult.getUrls().getRegular();
+        if (StringUtils.isBlank(url)) {
+          url = loLiConResult.getUrls().getOriginal();
+        }
+        InputStream is = Objects.requireNonNull(ServletUtils.get(url)).getContent();
+        builder.append(Contact.uploadImage(groupMsgEvent.getGroup(), is)).append(ProjectConst.WRAP)
+            .append("作者：").append(loLiConResult.getAuthor()).append(" - ").append(loLiConResult.getPid().toString());
+      } catch (Exception e) {
+        log.error("【随机涩图】获取涩图出现异常, 堆栈信息: ", e);
+        builder.append("涩涩大失败！接口异常，请联系主人处理吧~~");
+      }
+      if (!BotConst.QQ.equals(memberCode)) {
         redisCertUtils.setRandomImgCoolTime(code);
       }
     }
+  }
+
+  /**
+   * 获取R18图
+   */
+  private void handleR18(GroupMessageEvent event, MessageChainBuilder msgBuilder, String[] msgArr) {
+    if (!BotConst.QQ.equals(event.getSender().getId())) {
+      msgBuilder.append("无内鬼也不给你!");
+      return;
+    }
+    // TODO
   }
 
   /**
