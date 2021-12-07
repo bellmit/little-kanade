@@ -3,7 +3,6 @@ package com.plumekanade.robot.handler;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.plumekanade.robot.config.BotConfig;
 import com.plumekanade.robot.constants.BotConst;
-import com.plumekanade.robot.constants.CmdConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.CookieLib;
 import com.plumekanade.robot.entity.Tarot;
@@ -185,7 +184,7 @@ public class BotEventHandler extends SimpleListenerHost {
     try {
       // 群号id event.getSubject().getId()
       if (i == size) {  // 禁言
-        mute(null, groupId, from.getId(), "食我沉默啦！");
+        mute(groupId, from.getId(), "食我沉默啦！");
         return;
       } else if (i > size) {  // 戳回去
         nudge(null, groupId, from.getId());
@@ -195,7 +194,7 @@ public class BotEventHandler extends SimpleListenerHost {
         if (BotConst.WILL_ANGRY.equals(reply)) {  // 是否要生气了
           redisChatUtils.setWillAngryFlag(String.valueOf(groupId));
         } else if (reply.contains(BotConst.IS_ANGRY)) {   // 生气 禁言 不标记生气
-          mute(null, groupId, from.getId(), BotConst.NAME + reply);
+          mute(groupId, from.getId(), BotConst.NAME + reply);
           return;
         }
         msgBuilder.append(reply);
@@ -380,18 +379,20 @@ public class BotEventHandler extends SimpleListenerHost {
       boolean cdFlag = true;
 
       // 校验禁止词
+      boolean forbid = false;
       for (String s : msgArr) {
         if (ProjectConst.FORBID_WORD.contains(s)) {
           builder.append("不可以色色！不可以色色！");
+          forbid = true;
           break;
         }
       }
-      if (builder.size() > 5) {
+      if (forbid) {
         return;
       }
 
-      boolean sexyLvFlag = msgArr.length > 2 && (ProjectConst.ONE.equals(msgArr[1]) || ProjectConst.ZERO.equals(msgArr[1]));
-      if (sexyLvFlag && BotConst.QQ.equals(memberCode)) {
+      boolean sexyLvFlag = msgArr.length >= 2 && ProjectConst.ONE.equals(msgArr[1]);
+      if (sexyLvFlag && !BotConst.QQ.equals(memberCode)) {
         builder.append("不可以这样哦~");
         cdFlag = false;
       } else {
@@ -446,9 +447,13 @@ public class BotEventHandler extends SimpleListenerHost {
   /**
    * 传入群号/群对象禁言某群员
    */
-  private void mute(Group group, Long groupId, Long memberId, String originMsg) {
+  private void mute(Long groupId, Long memberId, String originMsg) {
     try {
-      NormalMember member = (group = group == null ? BotConst.BOT.getGroup(groupId) : group).get(memberId);
+      Group group = BotConst.BOT.getGroup(groupId);
+      if (null == group) {
+        log.error("【禁言】机器人不存在群 {}, 禁言失败!", groupId);
+      }
+      NormalMember member = group.get(memberId);
       MessageChainBuilder msgBuilder = new MessageChainBuilder();
       switch (member.getPermission().getLevel()) {
         case 0 -> {
@@ -460,7 +465,7 @@ public class BotEventHandler extends SimpleListenerHost {
       }
       group.sendMessage(msgBuilder.build());
     } catch (Exception e) {
-      log.error("【禁言】机器人不在群 {} 中 or 用户 {} 不在群中 or 机器人权限不足, 禁言失败, 堆栈信息: ", null == groupId ? group.getId() : groupId, memberId, e);
+      log.error("【禁言】用户 {} 不在群中 or 机器人权限不足, 禁言失败, 堆栈信息: ", memberId, e);
     }
   }
 
