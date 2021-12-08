@@ -38,6 +38,10 @@ public class ResultMsg implements Serializable {
     return new ResultMsg(code, msg);
   }
 
+  public static ResultMsg error(String msg) {
+    return new ResultMsg(CodeEnum.ERROR.getCode(), msg);
+  }
+
   public ResultMsg(CodeEnum resultEnum, Object data) {
     this.code = resultEnum.getCode();
     this.msg = resultEnum.getMsg();

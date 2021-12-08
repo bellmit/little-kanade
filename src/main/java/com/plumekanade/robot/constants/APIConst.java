@@ -16,11 +16,6 @@ public class APIConst {
   public static final String LO_LI_CON_IMG = "https://api.lolicon.app/setu/v2";
   // pixiv的图片反代地址
   public static final String IMG_PROXY_DOMAIN = "i.acgmx.com";
-  // pixiv的referer
-  public static final String REFERER_KEY = "Referer";
-  public static final String REFERER_VAL = "https://www.pixiv.net/";
-  // pixiv原图地址
-  public static final String PIXIV_ORIGIN_URL = "https://i.pximg.net";
 
 
   // 腾讯自然语言处理(NLP)API 50w次/天 文档地址: https://cloud.tencent.com/document/product/271/35486
