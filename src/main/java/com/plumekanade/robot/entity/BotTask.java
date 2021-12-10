@@ -7,6 +7,7 @@ import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
 import java.util.Date;
@@ -19,6 +20,7 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("bot_task")
 public class BotTask implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId

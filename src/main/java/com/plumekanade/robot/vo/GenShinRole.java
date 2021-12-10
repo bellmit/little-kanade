@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @Data
 @JsonPropertyOrder(alphabetic = true)
 public class GenShinRole implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // ?

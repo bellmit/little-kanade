@@ -7,18 +7,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 机器人词典/字典表
- * @version 1.0
+ *
  * @author kanade
+ * @version 1.0
  * @date 2021-11-30 15:58
  */
 @Data
 @TableName("bot_dic")
 public class BotDic implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId(type = IdType.AUTO)

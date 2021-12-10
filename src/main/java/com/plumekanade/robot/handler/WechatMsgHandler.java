@@ -1,6 +1,7 @@
 package com.plumekanade.robot.handler;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.plumekanade.robot.constants.DateConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
@@ -274,7 +275,7 @@ public class WechatMsgHandler implements WxMpMessageHandler {
    * 标签处理
    */
   public void handleTag(String tag) {
-    String[] tags = tag.split(ProjectConst.COMMA);
+    String[] tags = tag.split(Constants.COMMA);
     List<AcgTag> list = acgTagService.list(new LambdaQueryWrapper<AcgTag>().in(AcgTag::getName, Arrays.asList(tags)));
     if (list.size() > 0 && list.size() < tags.length) {
       for (String tagName : tags) {

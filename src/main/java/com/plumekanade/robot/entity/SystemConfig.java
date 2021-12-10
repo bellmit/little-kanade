@@ -6,18 +6,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 系统设置
- * @version 1.0
+ *
  * @author kanade
+ * @version 1.0
  * @date 2021-11-27 15:05:01
  */
 @Data
 @TableName("system_config")
 public class SystemConfig implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId

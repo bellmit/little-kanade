@@ -8,6 +8,7 @@ import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -23,6 +24,7 @@ import java.util.Date;
 @TableName("cookie_lib")
 public class CookieLib implements Serializable {
 
+  @Serial
   private static final long serialVersionUID = 1L;
   // 游戏角色id
   @TableId(type = IdType.AUTO)

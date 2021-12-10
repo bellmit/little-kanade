@@ -3,6 +3,7 @@ package com.plumekanade.robot.vo;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @JsonPropertyOrder(alphabetic = true)
 public class GenshinSpiralAbyss implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private Integer schedule_id;

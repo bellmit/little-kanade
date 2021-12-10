@@ -5,11 +5,13 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 备忘录
+ *
  * @author kanade
  * @date 2021-11-14 22:44
  */
@@ -17,6 +19,7 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("memorandum")
 public class Memorandum implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId

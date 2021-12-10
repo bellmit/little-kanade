@@ -1,6 +1,7 @@
 package com.plumekanade.robot.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.toolkit.Constants;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.BotTask;
@@ -123,7 +124,7 @@ public class DynamicTask implements SchedulingConfigurer {
 
     String groupIds = systemConfigService.getVal(SysKeyConst.REMIND_GROUP);
     boolean imgAdded = false;
-    for (String groupId : groupIds.split(ProjectConst.COMMA)) {
+    for (String groupId : groupIds.split(Constants.COMMA)) {
       Group group = bot.getGroup(Long.parseLong(groupId));
       if (null == group) {
         log.info("【定时提醒】已被移出群聊 {}, 提醒任务结束!", groupId);

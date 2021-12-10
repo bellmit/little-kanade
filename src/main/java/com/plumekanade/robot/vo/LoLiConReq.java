@@ -4,18 +4,21 @@ import com.plumekanade.robot.constants.APIConst;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
 /**
  * 图片索引请求VO(随机色图)
  * 文档地址: https://api.lolicon.app/#/setu
+ *
  * @author kanade
  * @date 2021-11-24 0:05
  */
 @Data
 @NoArgsConstructor
 public class LoLiConReq implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   /**

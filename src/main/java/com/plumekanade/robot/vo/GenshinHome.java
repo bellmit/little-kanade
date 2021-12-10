@@ -3,6 +3,7 @@ package com.plumekanade.robot.vo;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -15,6 +16,7 @@ import java.io.Serializable;
 @Data
 @JsonPropertyOrder(alphabetic = true)
 public class GenshinHome implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // 信任等级

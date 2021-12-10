@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -21,6 +22,7 @@ import java.util.List;
 @AllArgsConstructor
 @JsonPropertyOrder(alphabetic = true)
 public class GenshinCharacterReq implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @JsonProperty(value = "character_ids")

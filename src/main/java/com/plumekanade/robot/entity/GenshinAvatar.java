@@ -6,6 +6,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,6 +20,7 @@ import java.util.Date;
 @Data
 @TableName("genshin_avatar")
 public class GenshinAvatar implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId

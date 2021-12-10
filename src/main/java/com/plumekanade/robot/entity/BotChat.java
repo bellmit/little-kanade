@@ -6,18 +6,21 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 机器人聊天表
- * @version 1.0
+ *
  * @author kanade
+ * @version 1.0
  * @date 2021-11-30 16:04
  */
 @Data
 @TableName("bot_chat")
 public class BotChat implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId

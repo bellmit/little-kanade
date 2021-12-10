@@ -4,7 +4,9 @@ import com.plumekanade.robot.constants.BotConst;
 import com.plumekanade.robot.constants.CmdConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
+import com.plumekanade.robot.entity.GenshinAvatar;
 import com.plumekanade.robot.handler.BotEventHandler;
+import com.plumekanade.robot.service.GenshinAvatarService;
 import com.plumekanade.robot.service.SystemConfigService;
 import com.plumekanade.robot.utils.MiHoYoUtils;
 import lombok.AllArgsConstructor;
@@ -15,10 +17,9 @@ import net.mamoe.mirai.utils.BotConfiguration;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
-import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Map;
+import java.util.*;
+
+import static com.baomidou.mybatisplus.core.toolkit.StringPool.COMMA;
 
 
 /**
@@ -32,12 +33,18 @@ public class BotConfig {
 
   private final BotEventHandler botEventHandler;
   private final SystemConfigService systemConfigService;
+  private final GenshinAvatarService genshinAvatarService;
 
   /**
    * 初始化bot
    */
   @Bean
   public Bot bot() {
+    // 初始化原神角色map
+    List<GenshinAvatar> avatars = genshinAvatarService.list();
+    ProjectConst.GENSHIN_AVATAR_MAP = new HashMap<>(avatars.size());
+    avatars.forEach(avatar -> ProjectConst.GENSHIN_AVATAR_MAP.put(avatar.getId(), avatar));
+
     Map<String, String> mapVal = systemConfigService.getMapVal(null);
     setConfig(mapVal);  // 配置写入
 
@@ -79,9 +86,10 @@ public class BotConfig {
     BotConst.NAME = mapVal.get(SysKeyConst.BOT_NAME);
     MiHoYoUtils.COOKIE = mapVal.get(SysKeyConst.MHY_COOKIE);
     BotConst.QQ = Long.parseLong(mapVal.get(SysKeyConst.QQ));
+    ProjectConst.GALLERY_URL = mapVal.get(SysKeyConst.GALLERY_URL);
     BotConst.REPEAT_MODE = ProjectConst.ONE.equals(mapVal.get(SysKeyConst.REPEAT_MODE));
-    BotConst.CANCEL_ANGRY = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.CANCEL_ANGRY).split(ProjectConst.COMMA)));
-    BotConst.AWAKE_KEYWORD = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.AWAKE_KEYWORD).split(ProjectConst.COMMA)));
+    BotConst.CANCEL_ANGRY = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.CANCEL_ANGRY).split(COMMA)));
+    BotConst.AWAKE_KEYWORD = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.AWAKE_KEYWORD).split(COMMA)));
   }
 
 }

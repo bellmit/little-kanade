@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 import java.util.List;
@@ -12,18 +13,20 @@ import java.util.Map;
 /**
  * P站图片解析VO
  * 示例 -> doc/pixiv-preload-data.json
- * @version 1.0
+ *
  * @author kanade
+ * @version 1.0
  * @date 2021-12-08 12:01
  */
 @Data
 public class PixivArtwork implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
-
   private Map<String, Illust> illust;
 
   @Data
   public static class Illust implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     // 插画描述？
     private String alt;
@@ -68,12 +71,12 @@ public class PixivArtwork implements Serializable {
   }
 
 
-
   /**
    * 额外数据
    */
   @Data
   public static class ExtraData implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     // 描述
     private String description;
@@ -87,6 +90,7 @@ public class PixivArtwork implements Serializable {
    */
   @Data
   public static class Tags implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     // 作者id
     private String authorId;
@@ -103,6 +107,7 @@ public class PixivArtwork implements Serializable {
    */
   @Data
   public static class Tag implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     // 是否可删除
     private boolean deletable;
@@ -123,6 +128,7 @@ public class PixivArtwork implements Serializable {
    */
   @Data
   public static class Urls implements Serializable {
+    @Serial
     private static final long serialVersionUID = 1L;
     // 迷你图 48*48
     private String mini;

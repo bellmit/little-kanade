@@ -3,6 +3,7 @@ package com.plumekanade.robot.vo;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @JsonPropertyOrder(alphabetic = true)
 public class GenshinWorldInfo implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // 声望等级
@@ -35,6 +37,7 @@ public class GenshinWorldInfo implements Serializable {
   @Data
   public static class Offer implements Serializable {
 
+    @Serial
     private static final long serialVersionUID = 1L;
 
     // 奉献物品名称 如忍冬之树

@@ -6,11 +6,13 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
 /**
  * 群组配置
+ *
  * @author kanade
  * @version 1.0
  * @date 2021-08-24 16:32
@@ -18,6 +20,7 @@ import java.util.Date;
 @Data
 @TableName("group_config")
 public class GroupConfig implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
   @TableId
   private Long id;

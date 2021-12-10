@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -17,6 +18,7 @@ import java.util.Date;
 @Data
 @TableName("bot_function_word")
 public class BotFunctionWord implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId(type = IdType.AUTO)

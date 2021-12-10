@@ -2,6 +2,7 @@ package com.plumekanade.robot.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -13,6 +14,7 @@ import java.io.Serializable;
  */
 @Data
 public class AbyssCommonRank implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // 角色id
@@ -24,5 +26,8 @@ public class AbyssCommonRank implements Serializable {
   // 角色星级
   private Integer rarity;
 
-
+  public AbyssCommonRank() {
+    this.value = 0;
+    this.avatar_id = null;
+  }
 }

@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -20,6 +21,7 @@ import java.util.Date;
 @Data
 @TableName("qiu_qiu_translate")
 public class QiuQiuTranslate implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId(type = IdType.AUTO)
@@ -31,5 +33,5 @@ public class QiuQiuTranslate implements Serializable {
   // 创建时间
   @JsonFormat(pattern = DateConst.DT, timezone = DateConst.TZ)
   private Date createTime;
-  
+
 }

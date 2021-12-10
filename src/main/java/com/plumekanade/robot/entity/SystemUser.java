@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -19,6 +20,7 @@ import java.util.Date;
 @Data
 @TableName("system_user")
 public class SystemUser implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId

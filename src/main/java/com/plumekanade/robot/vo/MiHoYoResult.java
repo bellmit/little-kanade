@@ -2,6 +2,7 @@ package com.plumekanade.robot.vo;
 
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 
 /**
@@ -12,6 +13,7 @@ import java.io.Serializable;
  */
 @Data
 public class MiHoYoResult implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   // 0成功

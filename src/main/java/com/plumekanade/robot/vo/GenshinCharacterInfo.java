@@ -3,6 +3,7 @@ package com.plumekanade.robot.vo;
 import com.fasterxml.jackson.annotation.JsonPropertyOrder;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 
@@ -16,6 +17,7 @@ import java.util.List;
 @Data
 @JsonPropertyOrder(alphabetic = true)
 public class GenshinCharacterInfo implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   private Long id;
@@ -50,7 +52,8 @@ public class GenshinCharacterInfo implements Serializable {
    */
   @Data
   public static class Weapon implements Serializable {
-    
+
+    @Serial
     private static final long serialVersionUID = 1L;
     private Long id;
     // 名称
@@ -78,7 +81,8 @@ public class GenshinCharacterInfo implements Serializable {
    */
   @Data
   public static class Reliquary implements Serializable {
-    
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;
@@ -112,7 +116,8 @@ public class GenshinCharacterInfo implements Serializable {
    */
   @Data
   public static class Constellation implements Serializable {
-    
+
+    @Serial
     private static final long serialVersionUID = 1L;
 
     private Long id;

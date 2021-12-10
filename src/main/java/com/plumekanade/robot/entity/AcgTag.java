@@ -7,6 +7,7 @@ import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -20,6 +21,7 @@ import java.util.Date;
 @NoArgsConstructor
 @TableName("acg_tag")
 public class AcgTag implements Serializable {
+  @Serial
   private static final long serialVersionUID = 1L;
 
   @TableId

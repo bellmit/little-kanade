@@ -136,21 +136,23 @@ public class ConvertUtils {
         builder.append(ProjectConst.GENSHIN_AVATAR_MAP.get(rank.getAvatar_id()).getName())
             .append(spacer).append(rank.getValue()).append("次").append(ProjectConst.SPACE));
 
-    AbyssCommonRank defeatRank = abyss.getDefeat_rank().get(0);
-    AbyssCommonRank damageRank = abyss.getDamage_rank().get(0);
-    AbyssCommonRank takeDamageRank = abyss.getTake_damage_rank().get(0);
-    AbyssCommonRank normalSkillRank = abyss.getNormal_skill_rank().get(0);
-    AbyssCommonRank energySkillRank = abyss.getEnergy_skill_rank().get(0);
+    String nowNull = "暂无";
+    AbyssCommonRank defaultRank = new AbyssCommonRank();
+    AbyssCommonRank defeatRank = abyss.getDefeat_rank().size() > 0 ? abyss.getDefeat_rank().get(0) : defaultRank;
+    AbyssCommonRank damageRank = abyss.getDamage_rank().size() > 0 ? abyss.getDamage_rank().get(0) : defaultRank;
+    AbyssCommonRank takeDamageRank = abyss.getTake_damage_rank().size() > 0 ? abyss.getTake_damage_rank().get(0) : defaultRank;
+    AbyssCommonRank normalSkillRank = abyss.getNormal_skill_rank().size() > 0 ? abyss.getNormal_skill_rank().get(0) : defaultRank;
+    AbyssCommonRank energySkillRank = abyss.getEnergy_skill_rank().size() > 0 ? abyss.getEnergy_skill_rank().get(0) : defaultRank;
     builder.append(WRAP)
-        .append("最多击败数：").append(ProjectConst.GENSHIN_AVATAR_MAP.get(defeatRank.getAvatar_id()).getName())
+        .append("最多击败数：").append(defeatRank.getAvatar_id() == null ? nowNull : ProjectConst.GENSHIN_AVATAR_MAP.get(defeatRank.getAvatar_id()).getName())
         .append(spacer).append(defeatRank.getValue()).append(WRAP)
-        .append("最大伤害：").append(ProjectConst.GENSHIN_AVATAR_MAP.get(damageRank.getAvatar_id()).getName())
+        .append("最大伤害：").append(damageRank.getAvatar_id() == null ? nowNull : ProjectConst.GENSHIN_AVATAR_MAP.get(damageRank.getAvatar_id()).getName())
         .append(spacer).append(damageRank.getValue()).append(WRAP)
-        .append("最大承伤：").append(ProjectConst.GENSHIN_AVATAR_MAP.get(takeDamageRank.getAvatar_id()).getName())
+        .append("最大承伤：").append(takeDamageRank.getAvatar_id() == null ? nowNull : ProjectConst.GENSHIN_AVATAR_MAP.get(takeDamageRank.getAvatar_id()).getName())
         .append(spacer).append(takeDamageRank.getValue()).append(WRAP)
-        .append("使用最多元素战技：").append(ProjectConst.GENSHIN_AVATAR_MAP.get(normalSkillRank.getAvatar_id()).getName())
+        .append("使用最多元素战技：").append(normalSkillRank.getAvatar_id() == null ? nowNull : ProjectConst.GENSHIN_AVATAR_MAP.get(normalSkillRank.getAvatar_id()).getName())
         .append(spacer).append(normalSkillRank.getValue()).append("次").append(WRAP)
-        .append("使用最多元素爆发：").append(ProjectConst.GENSHIN_AVATAR_MAP.get(energySkillRank.getAvatar_id()).getName())
+        .append("使用最多元素爆发：").append(energySkillRank.getAvatar_id() == null ? nowNull : ProjectConst.GENSHIN_AVATAR_MAP.get(energySkillRank.getAvatar_id()).getName())
         .append(spacer).append(energySkillRank.getValue()).append("次").append(WRAP);
   }
 
