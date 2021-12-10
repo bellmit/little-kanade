@@ -1,7 +1,6 @@
 package com.plumekanade.robot.controller;
 
 import com.plumekanade.robot.constants.ProjectConst;
-import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.Gallery;
 import com.plumekanade.robot.service.GalleryService;
 import com.plumekanade.robot.utils.PixivUtils;
@@ -20,7 +19,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.io.InputStream;
 
 import static com.baomidou.mybatisplus.core.toolkit.StringPool.COMMA;
 import static com.baomidou.mybatisplus.core.toolkit.StringPool.UNDERSCORE;
@@ -58,8 +56,10 @@ public class PixivParseController {
       StringBuilder tagBuilder = new StringBuilder();
       for (PixivArtwork.Tag tag : illust.getTags().getTags()) {
         tagBuilder.append(tag.getTag()).append(COMMA);
-        for (String value : tag.getTranslation().values()) {
-          tagBuilder.append(value).append(COMMA);
+        if (null != tag.getTranslation()) {
+          for (String value : tag.getTranslation().values()) {
+            tagBuilder.append(value).append(COMMA);
+          }
         }
       }
 
