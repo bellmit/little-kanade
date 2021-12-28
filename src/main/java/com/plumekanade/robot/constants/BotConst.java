@@ -36,5 +36,7 @@ public class BotConst {
 
   // 部分静态图片地址
   public static final String IMG_GS = "/home/littleKanade/imgSource/gaoshi.png";
+  // 牛牛账号
+  public static final Long NIU_NIU = 0L;
 
 }

@@ -94,7 +94,7 @@ public class BotEventHandler extends SimpleListenerHost {
     long senderId = event.getSender().getId();
     String msg = event.getMessage().serializeToMiraiCode();
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
-    log.info("【群消息】收到 {} - {}({}) 的消息: {}", group.getName(), event.getSenderName(), senderId, msg);
+    log.info("【群消息】收到 {} - {}({}) 的消息: \n{}", group.getName(), event.getSenderName(), senderId, msg);
 
     // 取消生气状态   是否主人                        不传入发送人直接查                         是否包含机器人名称
     if (BotConst.QQ.equals(senderId) && checkBotAngry(group.getId(), null, false) && msg.contains(BotConst.NAME)) {
@@ -256,6 +256,8 @@ public class BotEventHandler extends SimpleListenerHost {
           #查号2(此指令为B服)@101010101
           #丘丘语(未完成)@gusha
           #每日塔罗
+          #牛牛特攻@2(分钟,默认1)
+          #放过牛牛吧
           #参数配置@key@val@常量标记(可缺省)
 
           小功能：私聊直接发送米游社Cookie可执行米游社的原神自动签到功能
@@ -315,6 +317,24 @@ public class BotEventHandler extends SimpleListenerHost {
         } catch (Exception e) {
           e.printStackTrace();
         }
+      }
+      case NIU_NIU_TE_GONG -> {
+//        NormalMember member = group.get(BotConst.NIU_NIU);
+//        if (!member.isMuted()) {
+//          int d = 60;
+//          if (msgArr.length == 2) {
+//            d = Integer.parseInt(msgArr[1]) * 60;
+//          }
+//          member.mute(d);
+//        }
+//        msgBuilder.append("牛牛你怎么不说话啊");
+      }
+      case UN_MUTE_NIU_NIU -> {
+//        NormalMember member = group.get(BotConst.NIU_NIU);
+//        if (member.isMuted()) {
+//          member.unmute();
+//        }
+//        return;
       }
       default -> msgBuilder.append("?");
     }

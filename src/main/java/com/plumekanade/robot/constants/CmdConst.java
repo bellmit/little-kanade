@@ -18,6 +18,8 @@ public class CmdConst {
   public static final String DAILY_TAROT = "每日塔罗";
   public static final String CONFIGURATION = "参数配置";
   public static final String LITTLE_BLACK_HOUSE = "小黑屋";
+  public static final String NIU_NIU_TE_GONG = "牛牛特攻";
+  public static final String UN_MUTE_NIU_NIU = "放过牛牛吧";
   public static final String NO_MOLE = "无内鬼";
 
   // 指令/参数分隔符
