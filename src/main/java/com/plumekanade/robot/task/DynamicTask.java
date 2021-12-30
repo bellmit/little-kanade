@@ -69,7 +69,7 @@ public class DynamicTask implements SchedulingConfigurer {
   public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
 
     // 定时签到
-    taskRegistrar.addTriggerTask(this::signTask, context -> new CronTrigger(SIGN_CRON).nextExecutionTime(context));
+//    taskRegistrar.addTriggerTask(this::signTask, context -> new CronTrigger(SIGN_CRON).nextExecutionTime(context));
 
     // 定时提醒
     taskRegistrar.addTriggerTask(this::remindTask, context -> new CronTrigger(REMIND_CRON).nextExecutionTime(context));

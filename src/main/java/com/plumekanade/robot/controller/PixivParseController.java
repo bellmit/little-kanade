@@ -1,8 +1,10 @@
 package com.plumekanade.robot.controller;
 
+import com.plumekanade.robot.constants.PixivConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.Gallery;
 import com.plumekanade.robot.service.GalleryService;
+import com.plumekanade.robot.utils.CommonUtils;
 import com.plumekanade.robot.utils.PixivUtils;
 import com.plumekanade.robot.utils.ServletUtils;
 import com.plumekanade.robot.vo.PixivArtwork;
@@ -10,7 +12,9 @@ import com.plumekanade.robot.vo.ResultMsg;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
+import org.apache.http.Header;
 import org.apache.http.HttpEntity;
+import org.apache.http.message.BasicHeader;
 import org.jsoup.Jsoup;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -42,6 +46,7 @@ public class PixivParseController {
   /**
    * 解析单插画作品(可能多图片)
    * https://www.pixiv.net/artworks/94611329
+   * @param url https://plumekanade.com/pixivParse/artwork?sexy=1&num=1&url=https://www.pixiv.net/artworks/94611329
    *
    * @param sexy 涩图等级 0普通 1涩 2露点
    * @param num  该插画作品有几张图
@@ -70,17 +75,22 @@ public class PixivParseController {
       String filename = illust.getUserName() + UNDERSCORE + illust.getTitle() + UNDERSCORE + pixivId + UNDERSCORE + "p";
       String galleryUrl = ProjectConst.GALLERY_URL + (sexy == 0 ? "normal/" : (sexy == 1 ? "sexy/" : "bare/"));
 
+      url = originUrl;
+      Header header = new BasicHeader(PixivConst.REFERER_KEY, PixivConst.REFERER_VAL);
       for (int i = 0; i < num; i++) {
         String name = filename + i + suffix;
         File file = new File(path + name);
-        Gallery gallery = new Gallery(illust.getTitle(), name, pixivId, illust.getUserName(), sexy, file.getPath(), galleryUrl + name, tags, illust.getUploadDate());
+        Gallery gallery = new Gallery(illust.getTitle(), name, pixivId, illust.getUserName(), sexy,
+            file.getPath(), galleryUrl + name, tags, illust.getUploadDate());
         if (i > 0) {
           url = originUrl.replace("p0", "p" + i);
         }
-        HttpEntity httpEntity = ServletUtils.get(url);
+
+        HttpEntity httpEntity = ServletUtils.getWithHeader(url, header);
         if (null == httpEntity) {
-          return ResultMsg.error("获取图片失败，请查看是否能连接到 https://pixiv.net");
+          return ResultMsg.error("获取图片失败，请查看是否能连接到 https://pixiv.net/");
         }
+//        File file = CommonUtils.writeFile(httpEntity.getContent(), filePath);
         Thumbnails.of(httpEntity.getContent()).size(2560, 1440).outputQuality(0.9f).toFile(file);
             // .keepAspectRatio(false)   // 是否遵循原图比例 false不遵循
             // .scale(1f)        // 缩放

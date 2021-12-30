@@ -2,6 +2,9 @@ package com.plumekanade.robot.utils;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -128,6 +131,24 @@ public class CommonUtils {
     }
 
     return result;
+  }
+
+  /**
+   * 文件写入 InputStream写入到指定文件
+   */
+  public static File writeFile(InputStream is, String path) throws Exception {
+    File file = new File(path);
+    if (!file.exists()) {
+      file.createNewFile();
+    }
+    FileOutputStream fos = new FileOutputStream(file);
+    byte[] b = new byte[1024];
+    while (is.read(b) != -1) {
+      fos.write(b);// 写入数据
+    }
+    is.close();
+    fos.close();
+    return file;
   }
 
 }

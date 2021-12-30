@@ -53,6 +53,24 @@ public class ServletUtils {
   }
 
   /**
+   * 通用get
+   */
+  public static HttpEntity getWithHeader(String url, Header header) throws Exception {
+    // 创建Httpclient对象
+    CloseableHttpClient httpclient = HttpClients.createDefault();
+    // 创建http GET 并 发起请求
+    HttpGet httpGet = new HttpGet(url);
+    // 设置请求头
+    httpGet.setHeader(header);
+    CloseableHttpResponse response = httpclient.execute(httpGet);
+    // 判断返回状态是否为200
+    if (ProjectConst.SUCCESS.equals(response.getStatusLine().getStatusCode())) {
+      return response.getEntity();
+    }
+    return null;
+  }
+
+  /**
    * 需要加入头部的GET请求
    */
   public static String get(String url, Header header) throws Exception {
