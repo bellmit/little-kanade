@@ -71,7 +71,8 @@ public class PixivParseController {
       String originUrl = illust.getUrls().getOriginal();
       String suffix = originUrl.contains(ProjectConst.JPG) ? ".jpg" : ".png";
       String path = (sexy == 0 ? ProjectConst.NORMAL_GALLERY_PATH : (sexy == 1 ? ProjectConst.SEXY_GALLERY_PATH : ProjectConst.BARE_GALLERY_PATH)) + "/";
-      String filename = illust.getUserName() + UNDERSCORE + illust.getTitle() + UNDERSCORE + pixivId + UNDERSCORE + "p";
+      // 防路径插入
+      String filename = (illust.getUserName() + UNDERSCORE + illust.getTitle() + UNDERSCORE + pixivId + UNDERSCORE + "p").replaceAll("/", "");
       String galleryUrl = ProjectConst.GALLERY_URL + (sexy == 0 ? "normal/" : (sexy == 1 ? "sexy/" : "bare/"));
 
       url = originUrl;
