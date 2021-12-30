@@ -4,7 +4,6 @@ import com.plumekanade.robot.constants.PixivConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.Gallery;
 import com.plumekanade.robot.service.GalleryService;
-import com.plumekanade.robot.utils.CommonUtils;
 import com.plumekanade.robot.utils.PixivUtils;
 import com.plumekanade.robot.utils.ServletUtils;
 import com.plumekanade.robot.vo.PixivArtwork;
@@ -71,7 +70,7 @@ public class PixivParseController {
       String tags = tagBuilder.substring(0, tagBuilder.length() - 1);
       String originUrl = illust.getUrls().getOriginal();
       String suffix = originUrl.contains(ProjectConst.JPG) ? ".jpg" : ".png";
-      String path = sexy == 0 ? ProjectConst.NORMAL_GALLERY_PATH : (sexy == 1 ? ProjectConst.SEXY_GALLERY_PATH : ProjectConst.BARE_GALLERY_PATH) + "/";
+      String path = (sexy == 0 ? ProjectConst.NORMAL_GALLERY_PATH : (sexy == 1 ? ProjectConst.SEXY_GALLERY_PATH : ProjectConst.BARE_GALLERY_PATH)) + "/";
       String filename = illust.getUserName() + UNDERSCORE + illust.getTitle() + UNDERSCORE + pixivId + UNDERSCORE + "p";
       String galleryUrl = ProjectConst.GALLERY_URL + (sexy == 0 ? "normal/" : (sexy == 1 ? "sexy/" : "bare/"));
 

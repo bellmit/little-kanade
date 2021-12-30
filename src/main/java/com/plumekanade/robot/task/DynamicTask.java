@@ -12,15 +12,10 @@ import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.CommonUtils;
 import com.plumekanade.robot.utils.MiHoYoUtils;
 import lombok.extern.slf4j.Slf4j;
-import me.chanjar.weixin.common.error.WxErrorException;
-import me.chanjar.weixin.mp.api.WxMpService;
-import me.chanjar.weixin.mp.bean.kefu.WxMpKefuMessage;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
 import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
-import net.mamoe.mirai.message.code.MiraiCode;
-import net.mamoe.mirai.message.data.Image;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.message.data.PlainText;
 import org.springframework.context.annotation.Configuration;
@@ -69,7 +64,7 @@ public class DynamicTask implements SchedulingConfigurer {
   public void configureTasks(ScheduledTaskRegistrar taskRegistrar) {
 
     // 定时签到
-//    taskRegistrar.addTriggerTask(this::signTask, context -> new CronTrigger(SIGN_CRON).nextExecutionTime(context));
+    taskRegistrar.addTriggerTask(this::signTask, context -> new CronTrigger(SIGN_CRON).nextExecutionTime(context));
 
     // 定时提醒
     taskRegistrar.addTriggerTask(this::remindTask, context -> new CronTrigger(REMIND_CRON).nextExecutionTime(context));

@@ -57,7 +57,8 @@ public class BotConfig {
         noNetworkLog();
         // 指定设备信息
         fileBasedDeviceInfo();
-//        fileBasedDeviceInfo("deviceInfo.json");
+//        fileBasedDeviceInfo("device.json");
+//        setProtocol(MiraiProtocol.ANDROID_WATCH);
       }
     });
     try {
