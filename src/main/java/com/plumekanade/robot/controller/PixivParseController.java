@@ -95,7 +95,13 @@ public class PixivParseController {
             // .keepAspectRatio(false)   // 是否遵循原图比例 false不遵循
             // .scale(1f)        // 缩放
         gallery.setSize(file.length());
-        galleryService.save(gallery);
+        Gallery existGallery = galleryService.getImage(gallery.getPath());
+        if (null != existGallery) {
+          gallery.setId(existGallery.getId());
+          galleryService.updateById(gallery);
+        } else {
+          galleryService.save(gallery);
+        }
       }
     } catch (Exception e) {
       log.error("【Pixiv】解析P站指定插画页面失败, 地址: {}, 堆栈信息: ", url, e);

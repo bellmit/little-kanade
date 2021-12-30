@@ -85,4 +85,11 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
     Gallery gallery = page(new Page<>(page, 10), wrapper).getRecords().get((int) idx);
     return gallery.getPath();
   }
+
+  /**
+   * 根据path获取对应图片
+   */
+  public Gallery getImage(String path) {
+    return baseMapper.selectOne(new LambdaQueryWrapper<Gallery>().eq(Gallery::getPath, path));
+  }
 }
