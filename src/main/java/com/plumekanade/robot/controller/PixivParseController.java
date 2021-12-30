@@ -91,7 +91,7 @@ public class PixivParseController {
           return ResultMsg.error("获取图片失败，请查看是否能连接到 https://pixiv.net/");
         }
 //        File file = CommonUtils.writeFile(httpEntity.getContent(), filePath);
-        Thumbnails.of(httpEntity.getContent()).size(2560, 1440).outputQuality(0.9f).toFile(file);
+        Thumbnails.of(httpEntity.getContent()).size(2560, 2560).outputQuality(0.9f).toFile(file);
             // .keepAspectRatio(false)   // 是否遵循原图比例 false不遵循
             // .scale(1f)        // 缩放
         gallery.setSize(file.length());
