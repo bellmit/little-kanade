@@ -16,6 +16,7 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
@@ -99,6 +100,7 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
   /**
    * 压缩图库的图片
    */
+  @Transactional(rollbackFor = Exception.class)
   public Boolean compressImg() {
     LambdaQueryWrapper<Gallery> wrapper = new LambdaQueryWrapper<>();
     // 2MB左右 209????
