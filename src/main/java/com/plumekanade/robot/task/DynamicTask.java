@@ -113,7 +113,7 @@ public class DynamicTask implements SchedulingConfigurer {
     msgBuilder.append(new PlainText(handleWeiboMsg() + "米游社该签到了。\n距离深渊刷新还有" + time[0] + "天" + time[1] + "小时\n" + handleExtraMsg()));
     File img = null;
     if (Boolean.parseBoolean(systemConfigService.getVal(SysKeyConst.REMIND_IMG))) {
-      img = new File(galleryService.randomImg(Integer.parseInt(systemConfigService.getVal(SysKeyConst.REMIND_IMG_SEXY))));
+      img = new File(galleryService.randomImg(Integer.parseInt(systemConfigService.getVal(SysKeyConst.REMIND_IMG_SEXY)), null));
     }
     log.info("【定时提醒】消息内容: " + msgBuilder);
 

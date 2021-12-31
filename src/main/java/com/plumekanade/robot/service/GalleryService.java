@@ -20,10 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 /**
  * @author kanade
@@ -75,11 +72,28 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
    *
    * @date 2021-08-27 15:15
    */
-  public String randomImg(int sexyState) {
+  public String randomImg(int sexyState, List<String> params) {
     LambdaQueryWrapper<Gallery> wrapper = new LambdaQueryWrapper<>();
     wrapper.le(Gallery::getSexyState, sexyState);
+    if (null != params) {
+      for (String param : params) {
+        String[] strings = param.split(ProjectConst.VERTICAL);
+        wrapper.and(w -> {
+          for (int i = 0; i < strings.length; i++) {
+            if (i > 0) {
+              w.or();
+            }
+            w.like(Gallery::getTags, strings[i]);
+          }
+        });
+      }
+    }
 
-    long idx = CommonUtils.RANDOM.nextLong(count(wrapper));
+    long count = count(wrapper);
+    if (count == 0) {
+      return null;
+    }
+    long idx = CommonUtils.RANDOM.nextLong();
     long page = idx / 10;
     idx = idx % 10;
     if (idx == 0) {

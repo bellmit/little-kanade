@@ -50,6 +50,7 @@ public class ProjectConst {
   public static final String ONE = "1";
   public static final String ZERO = "0";
   public static final String SLASH = "/";
+  public static final String VERTICAL = "\\|";
   public static final String FORBID_WORD = "立华奏橘奏立華 かなでたちばな かなでTachibalaKanade天使的心跳AngelBeatsangelbeatsab";
   public static final String PNG = "png";
   public static final String JPG = "jpg";

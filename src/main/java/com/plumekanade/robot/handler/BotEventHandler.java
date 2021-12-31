@@ -3,6 +3,7 @@ package com.plumekanade.robot.handler;
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.plumekanade.robot.config.BotConfig;
 import com.plumekanade.robot.constants.BotConst;
+import com.plumekanade.robot.constants.CmdConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.CookieLib;
 import com.plumekanade.robot.entity.Tarot;
@@ -150,8 +151,15 @@ public class BotEventHandler extends SimpleListenerHost {
         // 未处于冷却状态
         if (!redisChatUtils.isRepeatCooling(groupCode)) {
           if (msg.equals(prevMsg)) {
-            group.sendMessage(msgBuilder.append(MiraiCode.deserializeMiraiCode(msg)).build());   // 复读
-            redisChatUtils.setRepeatCooling(groupCode);   // 设置冷却
+            // 打断复读
+            if (CommonUtils.RANDOM.nextInt(3) == 0) {
+              List<String> words = botFunctionWordService.getWords(8);
+              msgBuilder.append(words.get(CommonUtils.RANDOM.nextInt(words.size())));
+            } else {
+              msgBuilder.append(MiraiCode.deserializeMiraiCode(msg));
+              group.sendMessage(msgBuilder.build());   // 复读
+              redisChatUtils.setRepeatCooling(groupCode);   // 设置冷却
+            }
             msg = "";  // 重置上一条聊天记录
           }
           redisChatUtils.setRepeatRecord(groupCode, msg);   // 保存聊天记录, 留作下次复读比照
@@ -249,7 +257,7 @@ public class BotEventHandler extends SimpleListenerHost {
     switch (msgArr[0]) {
       // 指令列表
       case CMD_LIST -> msgBuilder.append("""
-          #随机图片
+          #随机图片@原神@刻晴|凝光
           #随机涩图@jk|少女@女仆|猫耳
           #账号查询@101010101
           #查号@101010101
@@ -277,26 +285,8 @@ public class BotEventHandler extends SimpleListenerHost {
           msgBuilder.append("获取角色异常，请确认是否绑定米哈游账号");
         }
       }
-      case RANDOM_IMAGE -> {
-        String groupId = String.valueOf(group.getId());
-        synchronized (groupId.intern()) {
-          String result = handleCheckCooling(groupId);
-          if (null != result) {
-            msgBuilder.append(result);
-            break;
-          }
-          redisCertUtils.setRandomImgCoolTime(groupId);
-        }
-        msgBuilder.append(Contact.uploadImage(group, new File(galleryService.randomImg(groupConfigService.getGroupSexy(groupId)))));
-      }
-      case UPDATE_GALLERY -> {
-        if (BotConst.QQ.equals(sender.getId())) {
-          galleryService.updateGallery(ProjectConst.NORMAL_GALLERY_PATH, 0);
-          galleryService.updateGallery(ProjectConst.SEXY_GALLERY_PATH, 1);
-          galleryService.updateGallery(ProjectConst.BARE_GALLERY_PATH, 2);
-          msgBuilder.append("图库已更新完成");
-        }
-      }
+      case RANDOM_IMAGE -> handleRandomImage(event.getSender().getId(), msgText, group, msgBuilder);
+      case UPDATE_GALLERY -> msgBuilder.append("已更换为pixiv插画收集，此指令已 Deprecated");
       case QIU_QIU_TRANSLATION -> msgBuilder.append("小奏还没有学会丘丘语翻译呢");
       case RANDOM_SEXY -> handleRandomSexy(event, msgBuilder, msgArr);
       case NO_MOLE -> handleR18(event, msgBuilder, msgArr);
@@ -381,6 +371,7 @@ public class BotEventHandler extends SimpleListenerHost {
   private void handleRandomSexy(GroupMessageEvent groupMsgEvent, MessageChainBuilder builder, String[] msgArr) {
     Long memberCode = groupMsgEvent.getSender().getId();
     String code = String.valueOf(groupMsgEvent.getGroup().getId());
+
     if (!BotConst.QQ.equals(memberCode)) {
       String result = handleCheckCooling(code);
       if (null != result) {
@@ -563,6 +554,45 @@ public class BotEventHandler extends SimpleListenerHost {
       msgBuilder.append(Contact.uploadImage(group, new File(word)));
     } else {
       msgBuilder.append(word.replace(ProjectConst.REPLACE_CHAR, BotConst.NAME));
+    }
+  }
+
+  /**
+   * 随机图片（图库获取）
+   */
+  private void handleRandomImage(Long memberCode, String msgText, Group group, MessageChainBuilder msgBuilder) {
+    String groupId = String.valueOf(group.getId());
+    int sexyState = groupConfigService.getGroupSexy(groupId);
+
+    if (!BotConst.QQ.equals(memberCode)) {
+      String result = handleCheckCooling(groupId);
+      if (null != result) {
+        msgBuilder.append(result);
+        return;
+      }
+    }
+
+    synchronized (groupId.intern()) {
+      if (!BotConst.QQ.equals(memberCode)) {
+        String result = handleCheckCooling(groupId);
+        if (null != result) {
+          msgBuilder.append(result);
+          return;
+        }
+      }
+      redisCertUtils.setRandomImgCoolTime(groupId);
+    }
+
+    List<String> params = null;
+    String[] mainParams = msgText.replaceAll(RANDOM_IMAGE, "").split(SEPARATOR);
+    if (mainParams.length > 1) {
+      params = new ArrayList<>(Arrays.asList(mainParams));
+    }
+    String path = galleryService.randomImg(sexyState, params);
+    if (null != path) {
+      msgBuilder.append(Contact.uploadImage(group, new File(path)));
+    } else {
+      msgBuilder.append("再怎么找也找不到的啦，还不快邦邦入库");
     }
   }
 
