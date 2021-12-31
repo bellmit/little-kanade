@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
+import java.io.IOException;
 
 import static com.baomidou.mybatisplus.core.toolkit.StringPool.COMMA;
 import static com.baomidou.mybatisplus.core.toolkit.StringPool.UNDERSCORE;
@@ -69,31 +70,30 @@ public class PixivParseController {
 
       String tags = tagBuilder.substring(0, tagBuilder.length() - 1);
       String originUrl = illust.getUrls().getOriginal();
-      String suffix = originUrl.contains(ProjectConst.JPG) ? ".jpg" : ".png";
       String path = (sexy == 0 ? ProjectConst.NORMAL_GALLERY_PATH : (sexy == 1 ? ProjectConst.SEXY_GALLERY_PATH : ProjectConst.BARE_GALLERY_PATH)) + "/";
       // 防路径插入
       String filename = (illust.getUserName() + UNDERSCORE + illust.getTitle() + UNDERSCORE + pixivId + UNDERSCORE + "p").replaceAll("/", "");
       String galleryUrl = ProjectConst.GALLERY_URL + (sexy == 0 ? "normal/" : (sexy == 1 ? "sexy/" : "bare/"));
 
       url = originUrl;
+      String suffix = ProjectConst.POINT + ProjectConst.JPG;
       Header header = new BasicHeader(PixivConst.REFERER_KEY, PixivConst.REFERER_VAL);
       for (int i = 0; i < num; i++) {
+        // png压缩效果不明显 基本压缩不了多少
         String name = filename + i + suffix;
         File file = new File(path + name);
         Gallery gallery = new Gallery(illust.getTitle(), name, pixivId, illust.getUserName(), sexy,
             file.getPath(), galleryUrl + name, tags, illust.getUploadDate());
         if (i > 0) {
-          url = originUrl.replace("p0", "p" + i);
+          url = originUrl.replace("p0.jpg", "p" + i + suffix);
         }
 
         HttpEntity httpEntity = ServletUtils.getWithHeader(url, header);
         if (null == httpEntity) {
           return ResultMsg.error("获取图片失败，请查看是否能连接到 https://pixiv.net/");
         }
-//        File file = CommonUtils.writeFile(httpEntity.getContent(), filePath);
+        // 压缩
         Thumbnails.of(httpEntity.getContent()).size(2560, 2560).outputQuality(0.9f).toFile(file);
-            // .keepAspectRatio(false)   // 是否遵循原图比例 false不遵循
-            // .scale(1f)        // 缩放
         gallery.setSize(file.length());
         Gallery existGallery = galleryService.getImage(gallery.getPath());
         if (null != existGallery) {
