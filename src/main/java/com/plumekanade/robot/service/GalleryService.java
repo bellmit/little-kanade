@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.Gallery;
 import com.plumekanade.robot.entity.SystemConfig;
@@ -13,9 +14,11 @@ import com.plumekanade.robot.utils.CommonUtils;
 import com.plumekanade.robot.utils.ImageHashUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import net.coobird.thumbnailator.Thumbnails;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -92,4 +95,61 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
   public Gallery getImage(String path) {
     return baseMapper.selectOne(new LambdaQueryWrapper<Gallery>().eq(Gallery::getPath, path));
   }
+
+  /**
+   * 压缩图库的图片
+   */
+  public Boolean compressImg() {
+    LambdaQueryWrapper<Gallery> wrapper = new LambdaQueryWrapper<>();
+    // 2MB左右 209????
+    wrapper.gt(Gallery::getSize, 2100000);
+    List<Gallery> list = list(wrapper);
+    if (list.size() > 0) {
+      File file;
+      File compressFile;
+
+      for (Gallery gallery : list) {
+        String path = gallery.getPath();
+        file = new File(path);
+
+        // 图片不存在
+        if (!file.exists()) {
+          removeById(gallery);
+          continue;
+        }
+
+        try {
+          if (path.contains(ProjectConst.JPG)) {
+            gallery.setSize(compress(0.96f, file, file));
+          } else {
+            gallery.setUrl(gallery.getUrl().replaceAll(ProjectConst.PNG, ProjectConst.JPG));
+            gallery.setFilename(gallery.getFilename().replaceAll(ProjectConst.PNG, ProjectConst.JPG));
+            path = path.replaceAll(ProjectConst.PNG, ProjectConst.JPG);
+            compressFile = new File(path);
+            gallery.setSize(compress(0.96f, file, compressFile));
+            // 移除原有的png文件
+            log.info("【图片压缩】移除原 png 文件: {}", file.delete());
+          }
+        } catch (Exception e) {
+          log.error("【图片压缩】压缩图片出错, 异常堆栈: ", e);
+        }
+      }
+      updateBatchById(list);
+    }
+    return true;
+  }
+
+  /**
+   * 递归压缩图片直至小于2M
+   */
+  public long compress(float quality, File compressFile, File targetFile) throws Exception {
+    long size = compressFile.length();
+    if (size / 1024 > 2048) {
+      Thumbnails.of(compressFile).size(2560, 2560).outputQuality(quality).toFile(targetFile);
+      quality -= 0.03f;
+      size = compress(quality, new File(targetFile.getPath()), targetFile);
+    }
+    return size;
+  }
+
 }
