@@ -584,9 +584,10 @@ public class BotEventHandler extends SimpleListenerHost {
     }
 
     List<String> params = null;
-    String[] mainParams = msgText.replaceAll(RANDOM_IMAGE + SEPARATOR, "").split(SEPARATOR);
+    String[] mainParams = msgText.replaceAll(RANDOM_IMAGE, "").split(SEPARATOR);
     if (mainParams.length > 1) {
       params = new ArrayList<>(Arrays.asList(mainParams));
+      params.remove(0);
     }
     String path = galleryService.randomImg(sexyState, params);
     if (null != path) {
