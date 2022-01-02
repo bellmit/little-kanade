@@ -7,11 +7,8 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.Gallery;
-import com.plumekanade.robot.entity.SystemConfig;
 import com.plumekanade.robot.mapper.GalleryMapper;
-import com.plumekanade.robot.mapper.SystemConfigMapper;
 import com.plumekanade.robot.utils.CommonUtils;
-import com.plumekanade.robot.utils.ImageHashUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import net.coobird.thumbnailator.Thumbnails;
@@ -19,7 +16,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.File;
-import java.io.IOException;
 import java.util.*;
 
 /**
@@ -93,7 +89,7 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
     if (count == 0) {
       return null;
     }
-    long idx = CommonUtils.RANDOM.nextLong();
+    long idx = CommonUtils.RANDOM.nextLong(count);
     long page = idx / 10;
     idx = idx % 10;
     if (idx == 0) {
