@@ -153,13 +153,13 @@ public class BotEventHandler extends SimpleListenerHost {
           if (msg.equals(prevMsg)) {
             // 打断复读
             if (CommonUtils.RANDOM.nextInt(3) == 0) {
-              List<String> words = botFunctionWordService.getWords(8);
+              List<String> words = botFunctionWordService.getWords(9);
               msgBuilder.append(words.get(CommonUtils.RANDOM.nextInt(words.size())));
             } else {
               msgBuilder.append(MiraiCode.deserializeMiraiCode(msg));
-              group.sendMessage(msgBuilder.build());   // 复读
               redisChatUtils.setRepeatCooling(groupCode);   // 设置冷却
             }
+            group.sendMessage(msgBuilder.build());   // 复读
             msg = "";  // 重置上一条聊天记录
           }
           redisChatUtils.setRepeatRecord(groupCode, msg);   // 保存聊天记录, 留作下次复读比照
