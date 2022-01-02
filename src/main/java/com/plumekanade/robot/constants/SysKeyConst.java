@@ -13,7 +13,7 @@ public class SysKeyConst {
   public static final String REPEAT_MODE = "repeatMode";
   public static final String GALLERY_URL = "galleryUrl";
   public static final String BOT_NAME = "botName";
-  public static final String BOT_AUTH = "botAuth";
+  public static final String BOT_AUTH = "botAuth_2";
   public static final String QQ = "qq";
   public static final String OPENID = "wxOpenid";
   public static final String MHY_COOKIE = "mhyCookie";

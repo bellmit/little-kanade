@@ -6,7 +6,6 @@ import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.BotTask;
 import com.plumekanade.robot.entity.CookieLib;
-import com.plumekanade.robot.entity.Memorandum;
 import com.plumekanade.robot.handler.BotEventHandler;
 import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.CommonUtils;
@@ -79,7 +78,8 @@ public class DynamicTask implements SchedulingConfigurer {
   public void signTask() {
     log.info("===============================每天签到任务启动===============================");
     long sleep = 60000L;
-    for (CookieLib cookieLib : cookieLibService.list()) {
+    List<CookieLib> list = cookieLibService.list(new LambdaQueryWrapper<CookieLib>().eq(CookieLib::getState, 1));
+    for (CookieLib cookieLib : list) {
 
       try {   // 随机延迟 60秒~120秒
         Thread.sleep(CommonUtils.RANDOM.nextLong(sleep) + sleep);

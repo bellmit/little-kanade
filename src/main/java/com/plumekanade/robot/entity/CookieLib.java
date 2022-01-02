@@ -40,6 +40,8 @@ public class CookieLib implements Serializable {
   private Date createTime;
   @JsonFormat(pattern = DateConst.DT, timezone = DateConst.TZ)
   private Date updateTime;
+  // 状态 0停用 1正常
+  private Integer state;
 
   public CookieLib(Long qq, String ysId, String cookie) {
     this.ysId = ysId;
