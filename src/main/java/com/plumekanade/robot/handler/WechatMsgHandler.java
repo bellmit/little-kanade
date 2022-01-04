@@ -99,12 +99,12 @@ public class WechatMsgHandler implements WxMpMessageHandler {
           } else if (msgArr.length == 3) {   // 改密码
             content = accountDataService.wxModifyPwd(targetName, msgArr[2]);
             if (null == content) {
-              content = "已成功修改目标为 " + targetName + " 的密码";
+              content = "已成功修改目标 " + targetName;
             }
           } else {
             content = accountDataService.addData(msgArr);
             if (null == content) {
-              content = "已成功添加目标为 " + targetName + " 的密码";
+              content = "已成功添加目标 " + targetName;
             }
           }
         }
@@ -233,9 +233,9 @@ public class WechatMsgHandler implements WxMpMessageHandler {
       String raw = CommonUtils.decrypt(accountData.getCipherText(), accountData.getCount());
       String[] split = raw.split(CommonUtils.SECRET);
       builder.append(ProjectConst.DIVIDER).append(ProjectConst.WRAP)
-          .append(ProjectConst.TARGET).append(accountData.getTarget()).append(ProjectConst.WRAP)
-          .append(ProjectConst.USERNAME).append(split[0]).append(ProjectConst.WRAP)
-          .append(ProjectConst.PASSWORD).append(split[1]).append(ProjectConst.WRAP)
+          .append(accountData.getTarget()).append(ProjectConst.WRAP)
+          .append(split[0]).append(ProjectConst.WRAP)
+          .append(split[1]).append(ProjectConst.WRAP)
           .append(ProjectConst.DIVIDER).append(ProjectConst.WRAP);
     }
     return builder.length() > 0 ? builder.substring(0, builder.length() - 1) : "未查询到任何匹配的数据";

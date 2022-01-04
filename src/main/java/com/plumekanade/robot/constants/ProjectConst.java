@@ -28,12 +28,6 @@ public class ProjectConst {
 //  public static final String OPEN_ID = "odUcN6LjO32BFa-5GCUqyXbW3WT4";
   // 分割线
   public static final String DIVIDER = "--------------------";
-  // 目标
-  public static final String TARGET = "数据目标: ";
-  // 用户名
-  public static final String USERNAME = "un: ";
-  // 密码
-  public static final String PASSWORD = "pwd: ";
   // 换行
   public static final String WRAP = "\n";
 
