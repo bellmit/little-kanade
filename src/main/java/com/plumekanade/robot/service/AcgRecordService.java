@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.plumekanade.robot.entity.AcgRecord;
 import com.plumekanade.robot.mapper.AcgRecordMapper;
+import lombok.AllArgsConstructor;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
 
@@ -15,7 +16,10 @@ import java.util.List;
  * @date 2021-10-22 16:54
  */
 @Service
+@AllArgsConstructor
 public class AcgRecordService extends ServiceImpl<AcgRecordMapper, AcgRecord> {
+
+  private final AcgRecordMapper acgRecordMapper;
 
   /**
    * 模糊查询某动画
@@ -59,5 +63,12 @@ public class AcgRecordService extends ServiceImpl<AcgRecordMapper, AcgRecord> {
       wrapper.eq(AcgRecord::getQuarter, quarter);
     }
     return list(wrapper);
+  }
+
+  /**
+   * 更改番剧/小说/漫画状态
+   */
+  public void updateStateWithTitle(String title, String state) {
+    acgRecordMapper.updateStateWithTitle(title, state);
   }
 }

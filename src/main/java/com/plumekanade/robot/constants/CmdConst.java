@@ -28,6 +28,7 @@ public class CmdConst {
 
   public static final String CMD_LIST = "指令列表";
   public static final String ANIME_LIST = "追番列表";
+  public static final String ACG_STATE = "ACG状态";
   public static final String ABANDON_ANIME_LIST = "弃番列表";
   public static final String ALL_ANIME_LIST = "动画列表";
   public static final String ACCOUNT = "账号";

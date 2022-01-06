@@ -68,6 +68,7 @@ public class WechatMsgHandler implements WxMpMessageHandler {
             微博提醒#连续提醒的天数
             追番#202110
             追番列表
+            ACG状态#无职转生#0(在看)1(已看完)2(弃看)
             弃番列表
             动画列表
             签到附图#true#1(0/1/2图片等级)
@@ -85,10 +86,19 @@ public class WechatMsgHandler implements WxMpMessageHandler {
             备忘录#标题#内容
             备忘录#标题#内容#提醒时间
             """;
+        // 修改番剧状态
+        case ACG_STATE -> {
+          content = "更改番剧/漫画/小说状态成功";
+          if (msgArr.length != 3 || Integer.parseInt(msgArr[2]) > 2) {
+            content = "请注意格式: 追番状态#无职转生 第二季#0(在看)1(已看完)2(弃看)";
+            break;
+          }
+          acgRecordService.updateStateWithTitle(msgArr[1], msgArr[2]);
+        }
         // 追番列表
         case ANIME_LIST -> content = handleAnimeList(acgRecordService.getAllAnimations(null, 0));
         // 弃番列表
-        case ABANDON_ANIME_LIST -> content = handleAnimeList(acgRecordService.getAllAnimations(null, 1));
+        case ABANDON_ANIME_LIST -> content = handleAnimeList(acgRecordService.getAllAnimations(null, 2));
         // 所有动画
         case ALL_ANIME_LIST -> content = handleAnimeList(acgRecordService.getAllAnimations(null, null));
         // 查询某季度的动画

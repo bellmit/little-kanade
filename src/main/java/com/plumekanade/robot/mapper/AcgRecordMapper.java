@@ -2,6 +2,7 @@ package com.plumekanade.robot.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import com.plumekanade.robot.entity.AcgRecord;
+import org.apache.ibatis.annotations.Update;
 import org.springframework.stereotype.Repository;
 
 /**
@@ -11,4 +12,10 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface AcgRecordMapper extends BaseMapper<AcgRecord> {
+
+  /**
+   * 更改ACG状态
+   */
+  @Update("update acg_record set state = #{state} where title = #{title}")
+  void updateStateWithTitle(String title, String state);
 }
