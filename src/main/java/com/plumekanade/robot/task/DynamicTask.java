@@ -2,6 +2,9 @@ package com.plumekanade.robot.task;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.core.toolkit.Constants;
+import com.baomidou.mybatisplus.core.toolkit.StringUtils;
+import com.plumekanade.robot.constants.APIConst;
+import com.plumekanade.robot.constants.PixivConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.constants.SysKeyConst;
 import com.plumekanade.robot.entity.BotTask;
@@ -10,6 +13,7 @@ import com.plumekanade.robot.handler.BotEventHandler;
 import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.CommonUtils;
 import com.plumekanade.robot.utils.MiHoYoUtils;
+import com.plumekanade.robot.utils.ServletUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.contact.Contact;
@@ -17,6 +21,8 @@ import net.mamoe.mirai.contact.Friend;
 import net.mamoe.mirai.contact.Group;
 import net.mamoe.mirai.message.data.MessageChainBuilder;
 import net.mamoe.mirai.message.data.PlainText;
+import org.apache.http.Header;
+import org.apache.http.message.BasicHeader;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.SchedulingConfigurer;
 import org.springframework.scheduling.config.ScheduledTaskRegistrar;
@@ -90,7 +96,7 @@ public class DynamicTask implements SchedulingConfigurer {
       try {
         // 签到成功不发送消息
 //          BotListener.COMMON_SENDER.SENDER.sendGroupMsg(ProjectConst.LI_YUE, MiHoYoUtils.sign(relate.getCookie()));
-        log.info("【原神签到】{}", MiHoYoUtils.sign(cookieLib.getMhyCookie()));
+        log.info("【原神签到】签到结果: " + MiHoYoUtils.sign(cookieLib.getMhyCookie()));
       } catch (Exception e) {
         log.error("【原神签到】签到异常, 异常堆栈: ", e);
         // 向管理员发送消息
@@ -98,6 +104,17 @@ public class DynamicTask implements SchedulingConfigurer {
         if (null != master) {
           master.sendMessage("QQ: " + cookieLib.getQq() + "\n游戏UID: " + cookieLib.getYsId() + "\n签到异常");
         }
+      }
+
+      try {
+        if (StringUtils.isNotBlank(cookieLib.getWeiboCookie())) {
+          Header[] headers = new Header[2];
+          headers[0] = new BasicHeader("cookie", cookieLib.getWeiboCookie());
+          headers[1] = new BasicHeader(PixivConst.REFERER_KEY, APIConst.WEI_BO_REFERER);
+          log.info("【微博签到】签到结果: " + ServletUtils.get(APIConst.WEI_BO_SIGN, headers));
+        }
+      } catch (Exception e) {
+        log.error("【微博签到】签到异常, 堆栈信息: ", e);
       }
     }
     log.info("===============================每天签到任务结束===============================");

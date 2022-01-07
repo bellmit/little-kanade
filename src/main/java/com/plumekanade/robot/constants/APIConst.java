@@ -17,6 +17,13 @@ public class APIConst {
   // pixiv的图片反代地址
   public static final String IMG_PROXY_DOMAIN = "i.acgmx.com";
 
+  // 微博签到API
+  public static final String WEI_BO_SIGN = "https://weibo.com/p/aj/general/button?ajwvr=6&" +
+      "api=http://i.huati.weibo.com/aj/super/checkin&id=100808fc439dedbb06ca5fd858848e521b8716";
+  // 请求头Referer
+  public static final String WEI_BO_REFERER = "https://weibo.com/p/100808fc439dedbb06ca5fd858848e521b8716/super_index";
+  // 微博领奖励API
+
 
   // 腾讯自然语言处理(NLP)API 50w次/天 文档地址: https://cloud.tencent.com/document/product/271/35486
 //  public static final String NLP_DOMAIN = "https://nlp.tencentcloudapi.com";
