@@ -49,6 +49,8 @@ public class DynamicTask implements SchedulingConfigurer {
   // 11:00、21:00 发送提醒
   public static String REMIND_CRON = "0 0 12 * * ?";
   public static String SIGN_CRON = "0 0 7 * * ?";
+  // 00:10
+  public static String WEI_BO_SIGN_CRON = "0 10 0 * * ?";
   public static String GREET_CRON = "0 0 9,15,18,21 * * ?";
 
   @Resource
@@ -76,6 +78,9 @@ public class DynamicTask implements SchedulingConfigurer {
 
     // 定时打招呼
     taskRegistrar.addTriggerTask(this::greetTask, context -> new CronTrigger(GREET_CRON).nextExecutionTime(context));
+
+    // 微博自动签到
+    taskRegistrar.addTriggerTask(this::weiBoSignTask, context -> new CronTrigger(WEI_BO_SIGN_CRON).nextExecutionTime(context));
   }
 
   /**
@@ -104,17 +109,6 @@ public class DynamicTask implements SchedulingConfigurer {
         if (null != master) {
           master.sendMessage("QQ: " + cookieLib.getQq() + "\n游戏UID: " + cookieLib.getYsId() + "\n签到异常");
         }
-      }
-
-      try {
-        if (StringUtils.isNotBlank(cookieLib.getWeiboCookie())) {
-          Header[] headers = new Header[2];
-          headers[0] = new BasicHeader("cookie", cookieLib.getWeiboCookie());
-          headers[1] = new BasicHeader(PixivConst.REFERER_KEY, APIConst.WEI_BO_REFERER);
-          log.info("【微博签到】签到结果: " + ServletUtils.get(APIConst.WEI_BO_SIGN, headers));
-        }
-      } catch (Exception e) {
-        log.error("【微博签到】签到异常, 堆栈信息: ", e);
       }
     }
     log.info("===============================每天签到任务结束===============================");
@@ -177,6 +171,28 @@ public class DynamicTask implements SchedulingConfigurer {
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
     BotEventHandler.checkImgMsg(words.get(CommonUtils.RANDOM.nextInt(words.size())), group, msgBuilder);
     group.sendMessage(msgBuilder.build());
+  }
+
+  /**
+   * 微博自动签到
+   */
+  public void weiBoSignTask() {
+    log.info("\n===============================微博自动签到===============================");
+    List<CookieLib> list = cookieLibService.list(new LambdaQueryWrapper<CookieLib>()
+        .isNotNull(CookieLib::getWeiboCookie).eq(CookieLib::getState, ProjectConst.ONE));
+    try {
+      for (CookieLib cookieLib : list) {
+        if (StringUtils.isNotBlank(cookieLib.getWeiboCookie())) {
+          Header[] headers = new Header[2];
+          headers[0] = new BasicHeader("cookie", cookieLib.getWeiboCookie());
+          headers[1] = new BasicHeader(PixivConst.REFERER_KEY, APIConst.WEI_BO_REFERER);
+          log.info("【微博签到】签到结果: " + ServletUtils.get(APIConst.WEI_BO_SIGN, headers));
+        }
+      }
+    } catch (Exception e) {
+      log.error("【微博签到】签到异常, 堆栈信息: ", e);
+    }
+    log.info("\n===============================微博自动签到===============================");
   }
 
   /**
