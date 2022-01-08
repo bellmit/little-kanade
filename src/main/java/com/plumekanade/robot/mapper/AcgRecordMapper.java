@@ -16,6 +16,6 @@ public interface AcgRecordMapper extends BaseMapper<AcgRecord> {
   /**
    * 更改ACG状态
    */
-  @Update("update acg_record set state = #{state} where title = #{title}")
-  void updateStateWithTitle(String title, String state);
+  @Update("update acg_record set state = #{state} where acg_name = #{name}")
+  void updateStateWithName(String name, String state);
 }

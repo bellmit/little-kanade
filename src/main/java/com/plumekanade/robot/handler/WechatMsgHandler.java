@@ -93,7 +93,7 @@ public class WechatMsgHandler implements WxMpMessageHandler {
             content = "请注意格式: 追番状态#无职转生 第二季#0(在看)1(已看完)2(弃看)";
             break;
           }
-          acgRecordService.updateStateWithTitle(msgArr[1], msgArr[2]);
+          acgRecordService.updateStateWithName(msgArr[1], msgArr[2]);
         }
         // 追番列表
         case ANIME_LIST -> content = handleAnimeList(acgRecordService.getAllAnimations(null, 0));

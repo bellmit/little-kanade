@@ -68,7 +68,7 @@ public class AcgRecordService extends ServiceImpl<AcgRecordMapper, AcgRecord> {
   /**
    * 更改番剧/小说/漫画状态
    */
-  public void updateStateWithTitle(String title, String state) {
-    acgRecordMapper.updateStateWithTitle(title, state);
+  public void updateStateWithName(String name, String state) {
+    acgRecordMapper.updateStateWithName(name, state);
   }
 }
