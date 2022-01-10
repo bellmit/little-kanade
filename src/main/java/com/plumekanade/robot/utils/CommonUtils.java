@@ -6,7 +6,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.Base64;
@@ -131,6 +133,17 @@ public class CommonUtils {
     }
 
     return result;
+  }
+
+  /**
+   * 获取当天剩余秒数
+   */
+  public synchronized static long getTodaySurplusSeconds() {
+    ZoneOffset offset = ZoneOffset.of("+8");
+    LocalDateTime now = LocalDateTime.now();
+    long today = now.toEpochSecond(offset);
+    long tomorrow = LocalDateTime.of(now.getYear(), now.getMonth(), now.getDayOfMonth(), 0, 0).plusDays(1).toEpochSecond(offset);
+    return tomorrow - today;
   }
 
   /**

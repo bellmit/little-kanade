@@ -6,6 +6,7 @@ import com.plumekanade.robot.constants.BotConst;
 import com.plumekanade.robot.constants.CmdConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.CookieLib;
+import com.plumekanade.robot.entity.Player;
 import com.plumekanade.robot.entity.Tarot;
 import com.plumekanade.robot.service.*;
 import com.plumekanade.robot.utils.*;
@@ -41,6 +42,7 @@ public class BotEventHandler extends SimpleListenerHost {
 
   private final TarotService tarotService;
   private final BotDicService botDicService;
+  private final PlayerService playerService;
   private final BotChatService botChatService;
   private final RedisCertUtils redisCertUtils;
   private final RedisChatUtils redisChatUtils;
@@ -92,10 +94,18 @@ public class BotEventHandler extends SimpleListenerHost {
   @EventHandler
   private void handleGroupMsg(@NotNull GroupMessageEvent event) {
     Group group = event.getGroup();
-    long senderId = event.getSender().getId();
+    Long senderId = event.getSender().getId();
     String msg = event.getMessage().serializeToMiraiCode();
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
     log.info("【群消息】收到 {} - {}({}) 的消息: \n{}", group.getName(), event.getSenderName(), senderId, msg);
+
+    if (redisChatUtils.isUnSign(senderId)) {
+      synchronized (senderId.toString().intern()) {
+        if (redisChatUtils.isUnSign(senderId)) {
+          handlePlayerSign(senderId, event.getSender().getNick());
+        }
+      }
+    }
 
     // 取消生气状态   是否主人                        不传入发送人直接查                         是否包含机器人名称
     if (BotConst.QQ.equals(senderId) && checkBotAngry(group.getId(), null, false) && msg.contains(BotConst.NAME)) {
@@ -166,6 +176,29 @@ public class BotEventHandler extends SimpleListenerHost {
         }
       }
     }
+  }
+
+  /**
+   * 处理活跃状态
+   */
+  private void handlePlayerSign(Long qq, String nickname) {
+    Player player = playerService.getPlayer(qq);
+    if (null == player) {
+      player = new Player(qq, nickname);
+    }
+    player.setIntegral(player.getIntegral() + 1);
+    player.setTotalSign(player.getTotalSign() + 1);
+    if (System.currentTimeMillis() / 1000 - player.getLastSignTime() > 86400) {
+      player.setSeriesSign(1L);
+    } else {
+      player.setSeriesSign(player.getSeriesSign() + 1);
+    }
+    if (null == player.getId()) {
+      playerService.save(player);
+    } else {
+      playerService.updateById(player);
+    }
+    redisChatUtils.setSignState(qq);
   }
 
   /**

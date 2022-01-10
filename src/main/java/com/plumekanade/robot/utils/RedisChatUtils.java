@@ -14,6 +14,7 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.Set;
 
 /**
  * bot聊天相关缓存工具类
@@ -38,6 +39,8 @@ public class RedisChatUtils {
   private static final String ANGRY = "angry:";
   // 机器人被禁言状态
   private static final String MUTE = "mute:";
+  // 当天活跃状态
+  private static final String SIGN_STATE = "signState:";
 
   /**
    * 设置复读语句
@@ -191,6 +194,30 @@ public class RedisChatUtils {
       log.error("【Redis】判断机器人是否被禁言失败, 堆栈信息: ", e);
     }
     return false;
+  }
+
+  /**
+   * 设置用户活跃状态
+   */
+  public void setSignState(Long qq) {
+    try (Jedis jedis = redisChat.getResource()) {
+      jedis.set(SIGN_STATE + qq, System.currentTimeMillis() + "", SetParams.setParams().ex(CommonUtils.getTodaySurplusSeconds()));
+    } catch (Exception e) {
+      log.error("【Redis】设置用户活跃状态失败, 堆栈信息: ", e);
+    }
+  }
+
+  /**
+   * 获取用户活跃状态
+   * @return 已存在 -> false 不存在 -> true
+   */
+  public boolean isUnSign(Long qq) {
+    try (Jedis jedis = redisChat.getResource()) {
+      return !jedis.exists(SIGN_STATE + qq);
+    } catch (Exception e) {
+      log.error("【Redis】获取用户活跃状态失败, 堆栈信息: ", e);
+    }
+    return true;
   }
 
 }

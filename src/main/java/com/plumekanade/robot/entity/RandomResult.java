@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -20,7 +21,8 @@ import java.util.Date;
 @Data
 @TableName("random_result")
 public class RandomResult implements Serializable {
-  private static final long serialVersionUID = -4396704176951898689L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   @TableId(type = IdType.AUTO)
   private Long id;

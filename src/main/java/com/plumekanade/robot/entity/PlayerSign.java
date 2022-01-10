@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonFormat;
 import com.plumekanade.robot.constants.DateConst;
 import lombok.Data;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.util.Date;
 
@@ -18,7 +19,8 @@ import java.util.Date;
 @Data
 @TableName("player_sign")
 public class PlayerSign implements Serializable {
-  private static final long serialVersionUID = 7022368794399125595L;
+  @Serial
+  private static final long serialVersionUID = 1L;
 
   @TableId(type = IdType.AUTO)
   private Long id;
