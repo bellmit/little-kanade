@@ -6,6 +6,9 @@ package com.plumekanade.robot.constants;
  * @date 2021-04-17 11:21:01
  */
 public class APIConst {
+
+  public static final String CONTENT_TYPE_X_WWW = "application/x-www-form-urlencoded; charset=utf-8";
+
   // 茉莉机器人 www.itpk.cn
   public static final String MO_LI_KEY = "8994ea991ed9e235cc42eded32181edd";
   public static final String MO_LI_SECRET = "plumekanade";
@@ -18,8 +21,7 @@ public class APIConst {
   public static final String IMG_PROXY_DOMAIN = "i.acgmx.com";
 
   // 微博签到API
-  public static final String WEI_BO_SIGN = "https://weibo.com/p/aj/general/button?ajwvr=6&" +
-      "api=http://i.huati.weibo.com/aj/super/checkin&id=100808fc439dedbb06ca5fd858848e521b8716";
+  public static final String WEI_BO_SIGN = "https://weibo.com/p/aj/general/button?ajwvr=6&api=http://i.huati.weibo.com/aj/super/checkin&texta=%E7%AD%BE%E5%88%B0&textb=%E5%B7%B2%E7%AD%BE%E5%88%B0&status=0&id=100808fc439dedbb06ca5fd858848e521b8716&location=page_100808_super_index&timezone=GMT+0800&lang=zh-cn&plat=Win32&ua=Mozilla/5.0%20(Windows%20NT%206.1;%20Win64;%20x64)%20AppleWebKit/537.36%20(KHTML,%20like%20Gecko)%20Chrome/96.0.4664.110%20Safari/537.36%20Edg/96.0.1054.62&screen=1920*1080&__rnd=1641779620699&sudaref=weibo.com&display=0&retcode=6102";
   // 请求头Referer
   public static final String WEI_BO_REFERER = "https://weibo.com/p/100808fc439dedbb06ca5fd858848e521b8716/super_index";
   // 微博领奖励API

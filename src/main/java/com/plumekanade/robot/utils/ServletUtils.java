@@ -209,7 +209,7 @@ public class ServletUtils {
       response.setHeader("Access-Control-Expose-Headers", "KanadeToken");
       response.setHeader("Access-Control-Allow-Credentials", "true");
     }
-    response.setHeader("Content-type", "application/json;charset=UTF-8");
+    response.setHeader(ProjectConst.CONTENT_TYPE, "application/json;charset=UTF-8");
 
     try {
       response.getWriter().print(data);

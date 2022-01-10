@@ -76,8 +76,8 @@ public class DynamicTask implements SchedulingConfigurer {
     // 定时提醒
     taskRegistrar.addTriggerTask(this::remindTask, context -> new CronTrigger(REMIND_CRON).nextExecutionTime(context));
 
-    // 定时打招呼
-    taskRegistrar.addTriggerTask(this::greetTask, context -> new CronTrigger(GREET_CRON).nextExecutionTime(context));
+//    // 定时打招呼
+//    taskRegistrar.addTriggerTask(this::greetTask, context -> new CronTrigger(GREET_CRON).nextExecutionTime(context));
 
     // 微博自动签到
     taskRegistrar.addTriggerTask(this::weiBoSignTask, context -> new CronTrigger(WEI_BO_SIGN_CRON).nextExecutionTime(context));
@@ -183,9 +183,11 @@ public class DynamicTask implements SchedulingConfigurer {
     try {
       for (CookieLib cookieLib : list) {
         if (StringUtils.isNotBlank(cookieLib.getWeiboCookie())) {
-          Header[] headers = new Header[2];
+          Header[] headers = new Header[4];
           headers[0] = new BasicHeader("cookie", cookieLib.getWeiboCookie());
           headers[1] = new BasicHeader(PixivConst.REFERER_KEY, APIConst.WEI_BO_REFERER);
+          headers[2] = new BasicHeader(ProjectConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_X_WWW);
+          headers[3] = new BasicHeader("x-requested-with", "XMLHttpRequest");
           log.info("【微博签到】签到结果: " + ServletUtils.get(APIConst.WEI_BO_SIGN, headers));
         }
       }
