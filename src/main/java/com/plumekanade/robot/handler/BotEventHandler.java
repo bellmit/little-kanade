@@ -186,13 +186,15 @@ public class BotEventHandler extends SimpleListenerHost {
     if (null == player) {
       player = new Player(qq, nickname);
     }
-    player.setIntegral(player.getIntegral() + 1);
-    player.setTotalSign(player.getTotalSign() + 1);
-    if (System.currentTimeMillis() / 1000 - player.getLastSignTime() > 86400) {
+    long signTime = System.currentTimeMillis() / 1000;
+    if (signTime - player.getLastSignTime() > 86400) {
       player.setSeriesSign(1L);
     } else {
       player.setSeriesSign(player.getSeriesSign() + 1);
     }
+    player.setLastSignTime(signTime);
+    player.setIntegral(player.getIntegral() + 1);
+    player.setTotalSign(player.getTotalSign() + 1);
     if (null == player.getId()) {
       playerService.save(player);
     } else {
