@@ -31,12 +31,6 @@ public class ProjectConst {
   // 换行
   public static final String WRAP = "\n";
 
-  // 茉莉灵签参数
-  public static final String JOKE = "笑话";
-  public static final String GUAN_YIN_LOT = "观音灵签";
-  public static final String YUE_LAO_LOT = "月老灵签";
-  public static final String CAI_SHEN_LOT = "财神爷灵签";
-
   public static final String OK = "OK";
   public static final String POINT = ".";
   // 空格
@@ -49,10 +43,6 @@ public class ProjectConst {
   public static final String PNG = "png";
   public static final String JPG = "jpg";
   public static final String REPLACE_CHAR = "X";
-
-  // 请求类型
-  public static final String CONTENT_TYPE = "Content-Type";
-  public static final String CONTENT_TYPE_JSON = "application/json";
 
   // 图库普通图
   public static final String NORMAL_GALLERY_PATH = "/home/static/gallery/normal";

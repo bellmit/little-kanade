@@ -1,9 +1,6 @@
 package com.plumekanade.robot.config;
 
-import com.plumekanade.robot.constants.BotConst;
-import com.plumekanade.robot.constants.CmdConst;
-import com.plumekanade.robot.constants.ProjectConst;
-import com.plumekanade.robot.constants.SysKeyConst;
+import com.plumekanade.robot.constants.*;
 import com.plumekanade.robot.entity.GenshinAvatar;
 import com.plumekanade.robot.handler.BotEventHandler;
 import com.plumekanade.robot.service.GenshinAvatarService;
@@ -65,15 +62,16 @@ public class BotConfig {
       bot.login();
       bot.getEventChannel().registerListenerHost(botEventHandler);
       BotConst.BOT = bot;
-      log.info("""
-          
-          ----------------------------
-          Guard skill, Distortion!
-          Guard skill, Hand Sonic!
-          Guard skill, Wing!
-          Guard skill, Overdrive!
-          kanade has finished armed!
-          ----------------------------""");
+      log.info("\n小柠檬登录完成！");
+//      log.info("""
+//
+//          ----------------------------
+//          Guard skill, Distortion!
+//          Guard skill, Hand Sonic!
+//          Guard skill, Wing!
+//          Guard skill, Overdrive!
+//          kanade has finished armed!
+//          ----------------------------""");
     } catch (Exception e) {
       log.error("【机器人登录】机器人登录出现异常, 账密: {} - {}, 堆栈信息: ", arr[0], arr[1], e);
     }
@@ -92,6 +90,8 @@ public class BotConfig {
     BotConst.REPEAT_MODE = ProjectConst.ONE.equals(mapVal.get(SysKeyConst.REPEAT_MODE));
     BotConst.CANCEL_ANGRY = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.CANCEL_ANGRY).split(COMMA)));
     BotConst.AWAKE_KEYWORD = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.AWAKE_KEYWORD).split(COMMA)));
+    APIConst.MO_LI_KEY = mapVal.get(SysKeyConst.MO_LI_KEY);
+    APIConst.MO_LI_SECRET = mapVal.get(SysKeyConst.MO_LI_SECRET);
   }
 
 }

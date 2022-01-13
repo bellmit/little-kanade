@@ -119,7 +119,7 @@ public class ServletUtils {
     StringEntity entity = new StringEntity(params, StandardCharsets.UTF_8);
     entity.setContentEncoding(StandardCharsets.UTF_8.toString());
     // 发送Json格式的数据请求
-    httpPost.setHeader(ProjectConst.CONTENT_TYPE, ProjectConst.CONTENT_TYPE_JSON);
+    httpPost.setHeader(APIConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_JSON);
     httpPost.setEntity(entity);
     CloseableHttpResponse response = httpclient.execute(httpPost);
     // 判断返回状态是否为200
@@ -209,7 +209,7 @@ public class ServletUtils {
       response.setHeader("Access-Control-Expose-Headers", "KanadeToken");
       response.setHeader("Access-Control-Allow-Credentials", "true");
     }
-    response.setHeader(ProjectConst.CONTENT_TYPE, "application/json;charset=UTF-8");
+    response.setHeader(APIConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_JSON_CHARSET);
 
     try {
       response.getWriter().print(data);
@@ -283,8 +283,8 @@ public class ServletUtils {
       // 设置参数
       StringEntity entity = new StringEntity(params, StandardCharsets.UTF_8);
       // 发送Json格式的数据请求
-      entity.setContentType(ProjectConst.CONTENT_TYPE_JSON);
-      httpPost.setHeader(ProjectConst.CONTENT_TYPE, ProjectConst.CONTENT_TYPE_JSON);
+      entity.setContentType(APIConst.CONTENT_TYPE_JSON);
+      httpPost.setHeader(APIConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_JSON);
       httpPost.setEntity(entity);
       CloseableHttpResponse response = HttpClients.createDefault().execute(httpPost);
       // 判断返回状态是否为200

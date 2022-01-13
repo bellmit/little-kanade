@@ -7,13 +7,18 @@ package com.plumekanade.robot.constants;
  */
 public class APIConst {
 
+  public static final String PROTOCAL = "https";
   public static final String CONTENT_TYPE_X_WWW = "application/x-www-form-urlencoded; charset=utf-8";
+  // 请求类型
+  public static final String CONTENT_TYPE = "Content-Type";
+  public static final String CONTENT_TYPE_JSON = "application/json";
+  public static final String CONTENT_TYPE_JSON_CHARSET = CONTENT_TYPE_JSON + ";charset=UTF-8";
 
-  // 茉莉机器人 www.itpk.cn
-  public static final String MO_LI_KEY = "8994ea991ed9e235cc42eded32181edd";
-  public static final String MO_LI_SECRET = "plumekanade";
-  public static final String MO_LI_API = "http://i.itpk.cn/api.php?limit=8&api_key=" +
-      MO_LI_KEY + "&api_secret=" + MO_LI_SECRET + "&question=";
+  // 茉莉机器人 https://mly.app/
+  public static final String MO_LI = "https://i.mly.app/reply";
+  public static final String MO_LI_FILE = "https://files.molicloud.com/";
+  public static String MO_LI_KEY;
+  public static String MO_LI_SECRET;
 
   // 图片索引API post 或 get 参数详见LoLiCon
   public static final String LO_LI_CON_IMG = "https://api.lolicon.app/setu/v2";

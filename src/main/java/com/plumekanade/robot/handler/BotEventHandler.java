@@ -2,6 +2,7 @@ package com.plumekanade.robot.handler;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.plumekanade.robot.config.BotConfig;
+import com.plumekanade.robot.constants.APIConst;
 import com.plumekanade.robot.constants.BotConst;
 import com.plumekanade.robot.constants.CmdConst;
 import com.plumekanade.robot.constants.ProjectConst;
@@ -132,7 +133,7 @@ public class BotEventHandler extends SimpleListenerHost {
     // @/回复机器人
     if (msg.contains(BotConst.AT + BotConst.BOT.getId())) {
       msgBuilder.append(new At(senderId));
-      handleAt(group, msg, msgBuilder);
+      handleAt(group, msg, msgBuilder, senderId, event.getSenderName());
       return;
     }
 
@@ -270,13 +271,27 @@ public class BotEventHandler extends SimpleListenerHost {
   /**
    * 机器人被@处理
    */
-  private void handleAt(Group group, String msg, MessageChainBuilder msgBuilder) {
-    String reply = botDicService.queryTypeToGetWord(msg);
-    if (null == reply) {
+  private void handleAt(Group group, String msg, MessageChainBuilder msgBuilder, Long senderId, String senderName) {
+//    String reply = botDicService.queryTypeToGetWord(msg);
+    String msgText = msg.split(BotConst.AT_END)[1].trim();
+    if (StringUtils.isBlank(msgText)) {
       List<String> words = botFunctionWordService.getWords(7);
-      reply = words.get(CommonUtils.RANDOM.nextInt(words.size()));
+      String reply = words.get(CommonUtils.RANDOM.nextInt(words.size()));
+      checkImgMsg(reply, group, msgBuilder);
+    } else {
+      // 暂时只处理图片和文本
+      String reply = MoLiUtils.getReply(msgText, senderId, senderName);
+      if (reply.contains(APIConst.PROTOCAL)) {
+        try {
+          msgBuilder.append(Contact.uploadImage(group, ServletUtils.get(reply).getContent()));
+        } catch (Exception e) {
+          log.error("【茉莉API】解析图片地址失败, 堆栈信息: ", e);
+          msgBuilder.append("解析回复的图片地址失败.....");
+        }
+      } else {
+        msgBuilder.append(reply);
+      }
     }
-    checkImgMsg(reply, group, msgBuilder);
     group.sendMessage(msgBuilder.build());
   }
 
@@ -299,8 +314,6 @@ public class BotEventHandler extends SimpleListenerHost {
           #查号2(此指令为B服)@101010101
           #丘丘语(未完成)@gusha
           #每日塔罗
-          #牛牛特攻@2(分钟,默认1)
-          #放过牛牛吧
           #参数配置@key@val@常量标记(可缺省)
 
           小功能：私聊直接发送米游社Cookie可执行米游社的原神自动签到功能
@@ -342,24 +355,6 @@ public class BotEventHandler extends SimpleListenerHost {
         } catch (Exception e) {
           e.printStackTrace();
         }
-      }
-      case NIU_NIU_TE_GONG -> {
-//        NormalMember member = group.get(BotConst.NIU_NIU);
-//        if (!member.isMuted()) {
-//          int d = 60;
-//          if (msgArr.length == 2) {
-//            d = Integer.parseInt(msgArr[1]) * 60;
-//          }
-//          member.mute(d);
-//        }
-//        msgBuilder.append("牛牛你怎么不说话啊");
-      }
-      case UN_MUTE_NIU_NIU -> {
-//        NormalMember member = group.get(BotConst.NIU_NIU);
-//        if (member.isMuted()) {
-//          member.unmute();
-//        }
-//        return;
       }
       default -> msgBuilder.append("?");
     }

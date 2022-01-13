@@ -186,7 +186,7 @@ public class DynamicTask implements SchedulingConfigurer {
           Header[] headers = new Header[4];
           headers[0] = new BasicHeader("cookie", cookieLib.getWeiboCookie());
           headers[1] = new BasicHeader(PixivConst.REFERER_KEY, APIConst.WEI_BO_REFERER);
-          headers[2] = new BasicHeader(ProjectConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_X_WWW);
+          headers[2] = new BasicHeader(APIConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_X_WWW);
           headers[3] = new BasicHeader("x-requested-with", "XMLHttpRequest");
           log.info("【微博签到】签到结果: " + ServletUtils.get(APIConst.WEI_BO_SIGN, headers));
         }
