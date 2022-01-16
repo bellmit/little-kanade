@@ -4,6 +4,7 @@ import com.plumekanade.robot.constants.APIConst;
 import com.plumekanade.robot.constants.BotConst;
 import com.plumekanade.robot.vo.MoLiParam;
 import lombok.extern.slf4j.Slf4j;
+import net.mamoe.mirai.Bot;
 import org.apache.http.Header;
 import org.apache.http.message.BasicHeader;
 
@@ -27,11 +28,11 @@ public class MoLiUtils {
   /**
    * 获取机器人回复
    */
-  public static String getReply(String content, Long qq, String nickname) {
+  public static String getReply(Bot bot, String content, Long qq, String nickname) {
     Header[] headers = new Header[2];
     headers[0] = new BasicHeader(API_KEY, APIConst.MO_LI_KEY);
     headers[1] = new BasicHeader(API_SECRET, APIConst.MO_LI_SECRET);
-    MoLiParam.Request param = new MoLiParam.Request(content, qq, nickname, BotConst.BOT.getId(), BotConst.NAME);
+    MoLiParam.Request param = new MoLiParam.Request(content, qq, nickname, bot.getId(), BotConst.NAME);
     try {
       MoLiParam.Result result = MapperUtils.deserialize(
           ServletUtils.post(APIConst.MO_LI, MapperUtils.serialize(param), headers), MoLiParam.Result.class);

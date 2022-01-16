@@ -11,9 +11,11 @@ import lombok.extern.slf4j.Slf4j;
 import net.mamoe.mirai.Bot;
 import net.mamoe.mirai.BotFactory;
 import net.mamoe.mirai.utils.BotConfiguration;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import java.io.File;
 import java.util.*;
 
 import static com.baomidou.mybatisplus.core.toolkit.StringPool.COMMA;
@@ -45,15 +47,28 @@ public class BotConfig {
     Map<String, String> mapVal = systemConfigService.getMapVal(null);
     setConfig(mapVal);  // 配置写入
 
-    // 默认只取一个 后面有需要再改多个
-    String[] arr = mapVal.get(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
-    Bot bot = BotFactory.INSTANCE.newBot(Long.parseLong(arr[0]), arr[1], new BotConfiguration() {
+    // 第一个为主 第二个LiYue辅助使用
+    String[] auth = mapVal.get(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
+    String[] auth1 = mapVal.get(SysKeyConst.BOT_AUTH1).split(CmdConst.SEPARATOR2);
+    botLogin(Long.parseLong(auth1[0]), auth1[1], "小奏", "./minor");
+//    botLogin(Long.parseLong(auth1[0]), auth1[1], "小奏", "D:\\little-kanade\\cache\\minor");
+    return botLogin(Long.parseLong(auth[0]), auth[1], BotConst.NAME, null);
+  }
+
+  /**
+   * 机器人登录流程
+   */
+  private Bot botLogin(Long qq, String pwd, String botName, String workDir) {
+    Bot bot = BotFactory.INSTANCE.newBot(qq, pwd, new BotConfiguration() {
       {
         // 移除bot日志以及网络日志
         noBotLog();
         noNetworkLog();
         // 指定设备信息
         fileBasedDeviceInfo();
+        if (StringUtils.isNotBlank(workDir)) {
+          setWorkingDir(new File(workDir));
+        }
 //        fileBasedDeviceInfo("device.json");
 //        setProtocol(MiraiProtocol.ANDROID_WATCH);
       }
@@ -61,8 +76,7 @@ public class BotConfig {
     try {
       bot.login();
       bot.getEventChannel().registerListenerHost(botEventHandler);
-      BotConst.BOT = bot;
-      log.info("\n小柠檬登录完成！");
+      log.info("\n" + botName + "登录完成！");
 //      log.info("""
 //
 //          ----------------------------
@@ -73,7 +87,7 @@ public class BotConfig {
 //          kanade has finished armed!
 //          ----------------------------""");
     } catch (Exception e) {
-      log.error("【机器人登录】机器人登录出现异常, 账密: {} - {}, 堆栈信息: ", arr[0], arr[1], e);
+      log.error("【机器人登录】机器人登录出现异常, 账密: {} - {}, 堆栈信息: ", qq, pwd, e);
     }
     return bot;
   }
