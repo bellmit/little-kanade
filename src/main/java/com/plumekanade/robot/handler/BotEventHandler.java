@@ -404,22 +404,22 @@ public class BotEventHandler extends SimpleListenerHost {
     Long memberCode = groupMsgEvent.getSender().getId();
     String code = String.valueOf(groupMsgEvent.getGroup().getId());
 
-//    if (!BotConst.QQ.equals(memberCode)) {
-//      String result = handleCheckCooling(code);
-//      if (null != result) {
-//        builder.append(result);
-//        return;
-//      }
-//    }
+    if (!BotConst.QQ.equals(memberCode)) {
+      String result = handleCheckCooling(code);
+      if (null != result) {
+        builder.append(result);
+        return;
+      }
+    }
 
-//    synchronized (code.intern()) {
-//      if (!BotConst.QQ.equals(memberCode)) {
-//        String result = handleCheckCooling(code);
-//        if (null != result) {
-//          builder.append(result);
-//          return;
-//        }
-//      }
+    synchronized (code.intern()) {
+      if (!BotConst.QQ.equals(memberCode)) {
+        String result = handleCheckCooling(code);
+        if (null != result) {
+          builder.append(result);
+          return;
+        }
+      }
 
       // 校验禁止词
       boolean forbid = false;
@@ -456,10 +456,10 @@ public class BotEventHandler extends SimpleListenerHost {
         log.error("【随机涩图】获取涩图出现异常, 堆栈信息: ", e);
         builder.append("涩涩大失败！接口异常，请联系主人处理吧~~");
       }
-//      if (!BotConst.QQ.equals(memberCode)) {
-//        redisCertUtils.setRandomImgCoolTime(code);
-//      }
-//    }
+      if (!BotConst.QQ.equals(memberCode)) {
+        redisCertUtils.setRandomImgCoolTime(code);
+      }
+    }
   }
 
   /**
@@ -596,24 +596,24 @@ public class BotEventHandler extends SimpleListenerHost {
     String groupId = String.valueOf(group.getId());
     int sexyState = groupConfigService.getGroupSexy(groupId);
 
-//    if (!BotConst.QQ.equals(memberCode)) {
-//      String result = handleCheckCooling(groupId);
-//      if (null != result) {
-//        msgBuilder.append(result);
-//        return;
-//      }
-//    }
+    if (!BotConst.QQ.equals(memberCode)) {
+      String result = handleCheckCooling(groupId);
+      if (null != result) {
+        msgBuilder.append(result);
+        return;
+      }
+    }
 
-//    synchronized (groupId.intern()) {
-//      if (!BotConst.QQ.equals(memberCode)) {
-//        String result = handleCheckCooling(groupId);
-//        if (null != result) {
-//          msgBuilder.append(result);
-//          return;
-//        }
-//      }
-//      // redisCertUtils.setRandomImgCoolTime(groupId);
-//    }
+    synchronized (groupId.intern()) {
+      if (!BotConst.QQ.equals(memberCode)) {
+        String result = handleCheckCooling(groupId);
+        if (null != result) {
+          msgBuilder.append(result);
+          return;
+        }
+      }
+      // redisCertUtils.setRandomImgCoolTime(groupId);
+    }
 
     List<String> params = null;
     String[] mainParams = msgText.replaceAll(RANDOM_IMAGE, "").split(SEPARATOR);
@@ -624,7 +624,7 @@ public class BotEventHandler extends SimpleListenerHost {
     String path = galleryService.randomImg(sexyState, params);
     if (null != path) {
       msgBuilder.append(Contact.uploadImage(group, new File(path)));
-//      redisCertUtils.setRandomImgCoolTime(groupId);
+      redisCertUtils.setRandomImgCoolTime(groupId);
     } else {
       msgBuilder.append("再怎么找也找不到的啦，还不快邦邦入库");
     }
