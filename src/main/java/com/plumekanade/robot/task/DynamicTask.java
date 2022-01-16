@@ -52,9 +52,13 @@ public class DynamicTask implements SchedulingConfigurer {
   // 00:10
   public static String WEI_BO_SIGN_CRON = "0 10 0 * * ?";
   public static String GREET_CRON = "0 0 9,15,18,21 * * ?";
+  // 图片是否已加入到msgBuilder
+  public static boolean IMG_ADDED = false;
 
-  @Resource
+  @Resource(name = "bot")
   private Bot bot;
+//  @Resource(name = "kanadeBot")
+//  private Bot kanadeBot;
   @Resource
   private GalleryService galleryService;
   @Resource
@@ -119,6 +123,7 @@ public class DynamicTask implements SchedulingConfigurer {
    */
   public void remindTask() {
     log.info("===============================定时提醒任务启动===============================");
+    IMG_ADDED = false;
     MessageChainBuilder msgBuilder = new MessageChainBuilder();
     int[] time = CommonUtils.getSpiralAbyssSurplusDays();
     msgBuilder.append(new PlainText(handleWeiboMsg() + "米游社该签到了。\n距离深渊刷新还有" + time[0] + "天" + time[1] + "小时\n" + handleExtraMsg()));
@@ -129,24 +134,29 @@ public class DynamicTask implements SchedulingConfigurer {
     log.info("【定时提醒】消息内容: " + msgBuilder);
 
     String groupIds = systemConfigService.getVal(SysKeyConst.REMIND_GROUP);
-    boolean imgAdded = false;
     for (String groupId : groupIds.split(Constants.COMMA)) {
       Group group = bot.getGroup(Long.parseLong(groupId));
-      if (null == group) {
-        log.info("【定时提醒】已被移出群聊 {}, 提醒任务结束!", groupId);
-        return;
-      }
-      try {
-        if (!imgAdded && null != img && img.exists()) {
-          msgBuilder.append(Contact.uploadImage(group, img));
-          imgAdded = true;
-        }
-        group.sendMessage(msgBuilder.build());
-      } catch (Exception e) {
-        log.error("【定时提醒】任务异常, 堆栈信息: ", e);
-      }
+      handleRemind(group, groupId, img, msgBuilder);
+//      group = bot.getGroup(Long.parseLong(groupId));
+//      handleRemind(group, groupId, img, msgBuilder);
     }
     log.info("===============================定时提醒任务结束===============================");
+  }
+
+  private void handleRemind(Group group, String groupId, File img, MessageChainBuilder msgBuilder) {
+    if (null == group) {
+      log.info("【定时提醒】已被移出群聊 {}, 提醒任务结束!", groupId);
+      return;
+    }
+    try {
+      if (!IMG_ADDED && null != img && img.exists()) {
+        msgBuilder.append(Contact.uploadImage(group, img));
+        IMG_ADDED = true;
+      }
+      group.sendMessage(msgBuilder.build());
+    } catch (Exception e) {
+      log.error("【定时提醒】任务异常, 堆栈信息: ", e);
+    }
   }
 
   /**

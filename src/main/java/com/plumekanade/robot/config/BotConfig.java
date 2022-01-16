@@ -49,11 +49,18 @@ public class BotConfig {
 
     // 第一个为主 第二个LiYue辅助使用
     String[] auth = mapVal.get(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
-    String[] auth1 = mapVal.get(SysKeyConst.BOT_AUTH1).split(CmdConst.SEPARATOR2);
-    botLogin(Long.parseLong(auth1[0]), auth1[1], "小奏", "./minor");
+
+
 //    botLogin(Long.parseLong(auth1[0]), auth1[1], "小奏", "D:\\little-kanade\\cache\\minor");
-    return botLogin(Long.parseLong(auth[0]), auth[1], BotConst.NAME, null);
+//    return botLogin(Long.parseLong(auth[0]), auth[1], BotConst.NAME, null);
+    return botLogin(Long.parseLong(auth[0]), auth[1], BotConst.NAME, "./minor");
   }
+
+//  @Bean
+//  public Bot kanadeBot() {
+//    String[] auth = systemConfigService.getVal(SysKeyConst.BOT_AUTH1).split(CmdConst.SEPARATOR2);
+//    return botLogin(Long.parseLong(auth[0]), auth[1], "小奏", "./minor");
+//  }
 
   /**
    * 机器人登录流程
