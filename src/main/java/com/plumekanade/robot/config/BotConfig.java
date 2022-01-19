@@ -2,6 +2,7 @@ package com.plumekanade.robot.config;
 
 import com.plumekanade.robot.constants.*;
 import com.plumekanade.robot.entity.GenshinAvatar;
+import com.plumekanade.robot.entity.SystemConfig;
 import com.plumekanade.robot.handler.BotEventHandler;
 import com.plumekanade.robot.service.GenshinAvatarService;
 import com.plumekanade.robot.service.SystemConfigService;
@@ -44,12 +45,12 @@ public class BotConfig {
     ProjectConst.GENSHIN_AVATAR_MAP = new HashMap<>(avatars.size());
     avatars.forEach(avatar -> ProjectConst.GENSHIN_AVATAR_MAP.put(avatar.getId(), avatar));
 
-    Map<String, String> mapVal = systemConfigService.getMapVal(null);
-    setConfig(mapVal);  // 配置写入
+    // 从数据库读取配置信息
+    List<SystemConfig> configs = systemConfigService.list();
+    setConfig(configs);  // 配置写入
 
     // 第一个为主 第二个LiYue辅助使用
-    String[] auth = mapVal.get(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
-
+    String[] auth = ProjectConst.CONFIG_MAP.get(SysKeyConst.BOT_AUTH).split(CmdConst.SEPARATOR2);
 
 //    botLogin(Long.parseLong(auth1[0]), auth1[1], "小奏", "D:\\little-kanade\\cache\\minor");
 //    return botLogin(Long.parseLong(auth[0]), auth[1], BotConst.NAME, null);
@@ -102,17 +103,20 @@ public class BotConfig {
   /**
    * 配置写入
    */
-  public static void setConfig(Map<String, String> mapVal) {
+  public static void setConfig(List<SystemConfig> configs) {
 
-    BotConst.NAME = mapVal.get(SysKeyConst.BOT_NAME);
-    MiHoYoUtils.COOKIE = mapVal.get(SysKeyConst.MHY_COOKIE);
-    BotConst.QQ = Long.parseLong(mapVal.get(SysKeyConst.QQ));
-    ProjectConst.GALLERY_URL = mapVal.get(SysKeyConst.GALLERY_URL);
-    BotConst.REPEAT_MODE = ProjectConst.ONE.equals(mapVal.get(SysKeyConst.REPEAT_MODE));
-    BotConst.CANCEL_ANGRY = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.CANCEL_ANGRY).split(COMMA)));
-    BotConst.AWAKE_KEYWORD = new ArrayList<>(Arrays.asList(mapVal.get(SysKeyConst.AWAKE_KEYWORD).split(COMMA)));
-    APIConst.MO_LI_KEY = mapVal.get(SysKeyConst.MO_LI_KEY);
-    APIConst.MO_LI_SECRET = mapVal.get(SysKeyConst.MO_LI_SECRET);
+    ProjectConst.CONFIG_MAP = new HashMap<>(configs.size());
+    configs.forEach(config -> ProjectConst.CONFIG_MAP.put(config.getParam(), config.getVal()));
+
+    BotConst.NAME = ProjectConst.CONFIG_MAP.get(SysKeyConst.BOT_NAME);
+    MiHoYoUtils.COOKIE = ProjectConst.CONFIG_MAP.get(SysKeyConst.MHY_COOKIE);
+    BotConst.QQ = Long.parseLong(ProjectConst.CONFIG_MAP.get(SysKeyConst.QQ));
+    ProjectConst.GALLERY_URL = ProjectConst.CONFIG_MAP.get(SysKeyConst.GALLERY_URL);
+    BotConst.REPEAT_MODE = ProjectConst.ONE.equals(ProjectConst.CONFIG_MAP.get(SysKeyConst.REPEAT_MODE));
+    BotConst.CANCEL_ANGRY = new ArrayList<>(Arrays.asList(ProjectConst.CONFIG_MAP.get(SysKeyConst.CANCEL_ANGRY).split(COMMA)));
+    BotConst.AWAKE_KEYWORD = new ArrayList<>(Arrays.asList(ProjectConst.CONFIG_MAP.get(SysKeyConst.AWAKE_KEYWORD).split(COMMA)));
+    APIConst.MO_LI_KEY = ProjectConst.CONFIG_MAP.get(SysKeyConst.MO_LI_KEY);
+    APIConst.MO_LI_SECRET = ProjectConst.CONFIG_MAP.get(SysKeyConst.MO_LI_SECRET);
   }
 
 }

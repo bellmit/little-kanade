@@ -572,8 +572,7 @@ public class BotEventHandler extends SimpleListenerHost {
     }
     systemConfigService.updateVal(params[1], params[2]);
     if (length == 4) {  // 需要读取配置到常量
-      Map<String, String> mapVal = systemConfigService.getMapVal(null);
-      BotConfig.setConfig(mapVal);
+      BotConfig.setConfig(systemConfigService.list());
     }
     msgBuilder.append("配置已更新完成，注意测试是否配置成功");
   }

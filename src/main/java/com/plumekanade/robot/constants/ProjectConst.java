@@ -18,6 +18,8 @@ public class ProjectConst {
   public static final String B_SERVER = "cn_qd01";
   // 原神id -> 角色
   public static Map<Long, GenshinAvatar> GENSHIN_AVATAR_MAP;
+  // 系统配置
+  public static Map<String, String> CONFIG_MAP;
   // 图库URL
   public static String GALLERY_URL;
 
