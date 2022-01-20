@@ -212,12 +212,17 @@ public class WechatMsgHandler implements WxMpMessageHandler {
           content = builder.length() > 0 ? builder.substring(0, builder.length() - 2) : "没有执行任何任务...";
         }
         case WEIBO_REMIND -> {
-          systemConfigService.setVal(SysKeyConst.WEIBO_NUM, StringUtils.isNotBlank(targetName) ? targetName : ProjectConst.ZERO);
-          content = "已设置微博签到连续提醒" + targetName + "天";
+          String num = StringUtils.isNotBlank(targetName) ? targetName : ProjectConst.ZERO;
+          systemConfigService.setVal(SysKeyConst.WEIBO_NUM, num);
+          ProjectConst.CONFIG_MAP.put(SysKeyConst.WEIBO_NUM, num);
+          content = "已设置微博签到连续提醒" + num + "天";
         }
         case ATTACH_IMG -> {
           systemConfigService.setVal(SysKeyConst.REMIND_IMG, targetName);
           systemConfigService.setVal(SysKeyConst.REMIND_IMG_SEXY, msgArr[2]);
+
+          ProjectConst.CONFIG_MAP.put(SysKeyConst.REMIND_IMG, targetName);
+          ProjectConst.CONFIG_MAP.put(SysKeyConst.REMIND_IMG_SEXY, msgArr[2]);
           content = "已设置" + (Boolean.parseBoolean(targetName) ? "附带" : "不附带") + "图片";
         }
       }

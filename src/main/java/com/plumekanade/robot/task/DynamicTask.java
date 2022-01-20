@@ -109,7 +109,7 @@ public class DynamicTask implements SchedulingConfigurer {
       } catch (Exception e) {
         log.error("【原神签到】签到异常, 异常堆栈: ", e);
         // 向管理员发送消息
-        Friend master = bot.getFriend(Long.parseLong(systemConfigService.getVal(SysKeyConst.QQ)));
+        Friend master = bot.getFriend(Long.parseLong(ProjectConst.CONFIG_MAP.get(SysKeyConst.QQ)));
         if (null != master) {
           master.sendMessage("QQ: " + cookieLib.getQq() + "\n游戏UID: " + cookieLib.getYsId() + "\n签到异常");
         }
@@ -128,12 +128,12 @@ public class DynamicTask implements SchedulingConfigurer {
     int[] time = CommonUtils.getSpiralAbyssSurplusDays();
     msgBuilder.append(new PlainText(handleWeiboMsg() + "米游社该签到了。\n距离深渊刷新还有" + time[0] + "天" + time[1] + "小时\n" + handleExtraMsg()));
     File img = null;
-    if (Boolean.parseBoolean(systemConfigService.getVal(SysKeyConst.REMIND_IMG))) {
-      img = new File(galleryService.randomImg(Integer.parseInt(systemConfigService.getVal(SysKeyConst.REMIND_IMG_SEXY)), null));
+    if (Boolean.parseBoolean(ProjectConst.CONFIG_MAP.get(SysKeyConst.REMIND_IMG))) {
+      img = new File(galleryService.randomImg(Integer.parseInt(ProjectConst.CONFIG_MAP.get(SysKeyConst.REMIND_IMG_SEXY)), null));
     }
     log.info("【定时提醒】消息内容: " + msgBuilder);
 
-    String groupIds = systemConfigService.getVal(SysKeyConst.REMIND_GROUP);
+    String groupIds = ProjectConst.CONFIG_MAP.get(SysKeyConst.REMIND_GROUP);
     for (String groupId : groupIds.split(Constants.COMMA)) {
       Group group = bot.getGroup(Long.parseLong(groupId));
       handleRemind(group, groupId, img, msgBuilder);
@@ -164,7 +164,7 @@ public class DynamicTask implements SchedulingConfigurer {
    */
   public void greetTask() {
     int type = 1;
-    long groupId = Long.parseLong(systemConfigService.getVal(SysKeyConst.MU_JIAN));
+    long groupId = Long.parseLong(ProjectConst.CONFIG_MAP.get(SysKeyConst.MU_JIAN));
     Group group = bot.getGroup(groupId);
     if (null == group) {
       log.error("【打招呼】机器人不存在群 {}, 打招呼任务结束!", groupId);
@@ -235,9 +235,11 @@ public class DynamicTask implements SchedulingConfigurer {
    * 处理微博是否需要提醒
    */
   public String handleWeiboMsg() {
-    int num = Integer.parseInt(systemConfigService.getVal(SysKeyConst.WEIBO_NUM));
+    int num = Integer.parseInt(ProjectConst.CONFIG_MAP.get(SysKeyConst.WEIBO_NUM));
     if (num > 0) {
-      systemConfigService.setVal(SysKeyConst.WEIBO_NUM, String.valueOf(--num));
+      String surplusNum = String.valueOf(--num);
+      systemConfigService.setVal(SysKeyConst.WEIBO_NUM, surplusNum);
+      ProjectConst.CONFIG_MAP.put(SysKeyConst.WEIBO_NUM, surplusNum);
       return "微博和";
     }
     return "";

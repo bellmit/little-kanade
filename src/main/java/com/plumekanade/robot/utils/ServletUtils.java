@@ -195,22 +195,17 @@ public class ServletUtils {
    * 渲染到客户端
    *
    * @param data     json数据字符串
-   * @param isSystem 是否系统内使用 否的话不需要跨域等响应头
    */
-  public static void render(HttpServletResponse response, String data, boolean isSystem) {
+  public static void render(HttpServletResponse response, String data) {
 
-    if (isSystem) {
-      // 允许跨域
-      response.setHeader("Access-Control-Allow-Origin", "*");
-      // 允许自定义请求头token(允许head跨域)
-      response.setHeader("Access-Control-Allow-Headers",
-          "KanadeToken, Accept, Origin, X-Requested-With, Content-Type, Last-Modified, " +
-              "Access-Control-Request-Headers, Access-Control-Request-Method");
-      response.setHeader("Access-Control-Expose-Headers", "KanadeToken");
-      response.setHeader("Access-Control-Allow-Credentials", "true");
-    }
+    // 允许跨域
+    response.setHeader("Access-Control-Allow-Origin", "*");
+    // 允许自定义请求头token(允许head跨域)
+    response.setHeader("Access-Control-Allow-Headers", "kanade-token, Accept, Origin, X-Requested-With, " +
+        "Content-Type, Last-Modified, Access-Control-Request-Headers, Access-Control-Request-Method");
+    response.setHeader("Access-Control-Expose-Headers", "kanade-token");
+    response.setHeader("Access-Control-Allow-Credentials", "true");
     response.setHeader(APIConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_JSON_CHARSET);
-
     try {
       response.getWriter().print(data);
     } catch (Exception e) {

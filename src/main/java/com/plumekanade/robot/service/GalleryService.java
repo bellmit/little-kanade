@@ -37,7 +37,7 @@ public class GalleryService extends ServiceImpl<GalleryMapper, Gallery> {
    * @date 2021-08-26 16:10
    */
   public void updateGallery(String path, int sexyState) {
-    String galleryUrl = systemConfigService.getVal(SysKeyConst.GALLERY_URL) + (sexyState == 0 ? "normal/" : (sexyState == 1 ? "sexy/" : "bare/"));
+    String galleryUrl = ProjectConst.CONFIG_MAP.get(SysKeyConst.GALLERY_URL) + (sexyState == 0 ? "normal/" : (sexyState == 1 ? "sexy/" : "bare/"));
     try {
       File catalog = new File(path);
       File[] files = catalog.listFiles();

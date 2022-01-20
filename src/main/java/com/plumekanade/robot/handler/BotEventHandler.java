@@ -570,9 +570,9 @@ public class BotEventHandler extends SimpleListenerHost {
       msgBuilder.append("指令有误: #参数配置@key@value@常量标记(可缺省)");
       return;
     }
-    systemConfigService.updateVal(params[1], params[2]);
-    if (length == 4) {  // 需要读取配置到常量
-      BotConfig.setConfig(systemConfigService.list());
+    systemConfigService.setVal(params[1], params[2]);
+    if (length == 4) {  // 需要设置配置到常量
+      ProjectConst.CONFIG_MAP.put(params[1], params[2]);
     }
     msgBuilder.append("配置已更新完成，注意测试是否配置成功");
   }
