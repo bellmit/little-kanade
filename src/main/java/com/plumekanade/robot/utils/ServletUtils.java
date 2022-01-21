@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.plumekanade.robot.constants.APIConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.RandomEmoticon;
+import com.plumekanade.robot.enums.CodeEnum;
 import com.plumekanade.robot.vo.LoLiConResult;
 import com.plumekanade.robot.vo.MiHoYoEmoticon;
 import com.plumekanade.robot.vo.ResultMsg;
@@ -192,11 +193,11 @@ public class ServletUtils {
 //  }
 
   /**
-   * 渲染到客户端
+   * 渲染到客户端 一般用到这个都是返回错误信息
    *
-   * @param data     json数据字符串
+   * @param codeEnum 返回数据
    */
-  public static void render(HttpServletResponse response, String data) {
+  public static void render(HttpServletResponse response, CodeEnum codeEnum) {
 
     // 允许跨域
     response.setHeader("Access-Control-Allow-Origin", "*");
@@ -206,8 +207,9 @@ public class ServletUtils {
     response.setHeader("Access-Control-Expose-Headers", "kanade-token");
     response.setHeader("Access-Control-Allow-Credentials", "true");
     response.setHeader(APIConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_JSON_CHARSET);
+    response.setStatus(codeEnum.getCode());
     try {
-      response.getWriter().print(data);
+      response.getWriter().print(codeEnum.getMsg());
     } catch (Exception e) {
       log.error("render方法响应异常: ", e);
     }

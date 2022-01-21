@@ -2,6 +2,7 @@ package com.plumekanade.robot.filter;
 
 import com.baomidou.mybatisplus.core.toolkit.StringUtils;
 import com.plumekanade.robot.constants.AuthConst;
+import com.plumekanade.robot.enums.CodeEnum;
 import com.plumekanade.robot.utils.RedisCertUtils;
 import com.plumekanade.robot.utils.ServletUtils;
 import lombok.AllArgsConstructor;
@@ -33,10 +34,12 @@ public class AuthFilter extends OncePerRequestFilter {
   @Override
   protected void doFilterInternal(HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull FilterChain chain)
       throws ServletException, IOException {
-
+    String path = request.getServletPath();
     String token = request.getHeader(AuthConst.TOKEN_HEADER);
-    if (StringUtils.isBlank(token)) {   // token为空 跳登录
-      ServletUtils.render(response, "用户未登录");
+    //        非排除的API                   token为空                         非合法token
+    if (!AuthConst.EXCLUDE_PATH.contains(path) && (StringUtils.isBlank(token) || !redisCertUtils.validToken(token))) {
+      ServletUtils.render(response, CodeEnum.UN_LOGIN);   // 跳登录
+      return;
     }
     chain.doFilter(request, response);
   }

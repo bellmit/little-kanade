@@ -71,6 +71,13 @@
             <version>0.4.14</version>
         </dependency>
 
+        <!-- 不可逆加密 -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-core</artifactId>
+            <version>5.6.1</version>
+        </dependency>
+
 
         <dependency>
             <groupId>org.projectlombok</groupId>

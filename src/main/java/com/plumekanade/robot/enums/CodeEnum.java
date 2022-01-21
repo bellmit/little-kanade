@@ -14,6 +14,9 @@ public enum CodeEnum {
   SUCCESS(0, "ok"),
   ERROR(-1, "服务器出了点差错"),
 
+  UN_LOGIN(600, "用户未登录"),
+  PWD_ERROR(601, "账号或密码有误")
+
   ;
 
   private final int code;

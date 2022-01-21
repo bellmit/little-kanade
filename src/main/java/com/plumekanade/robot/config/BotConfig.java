@@ -84,16 +84,16 @@ public class BotConfig {
     try {
       bot.login();
       bot.getEventChannel().registerListenerHost(botEventHandler);
-      log.info("\n" + botName + "登录完成！");
-//      log.info("""
-//
-//          ----------------------------
-//          Guard skill, Distortion!
-//          Guard skill, Hand Sonic!
-//          Guard skill, Wing!
-//          Guard skill, Overdrive!
-//          kanade has finished armed!
-//          ----------------------------""");
+//      log.info("\n" + botName + "登录完成！");
+      log.info("""
+
+          ----------------------------
+          Guard skill, Distortion!
+          Guard skill, Hand Sonic!
+          Guard skill, Wing!
+          Guard skill, Overdrive!
+          kanade has finished armed!
+          ----------------------------""");
     } catch (Exception e) {
       log.error("【机器人登录】机器人登录出现异常, 账密: {} - {}, 堆栈信息: ", qq, pwd, e);
     }
