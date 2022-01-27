@@ -22,7 +22,6 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.io.IOException;
 
 import static com.baomidou.mybatisplus.core.toolkit.StringPool.COMMA;
 import static com.baomidou.mybatisplus.core.toolkit.StringPool.UNDERSCORE;
