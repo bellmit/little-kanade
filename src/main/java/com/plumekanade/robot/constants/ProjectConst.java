@@ -52,4 +52,7 @@ public class ProjectConst {
   public static final String SEXY_GALLERY_PATH = "/home/static/gallery/sexy";
   // 图库露点图
   public static final String BARE_GALLERY_PATH = "/home/static/gallery/bare";
+  // 原图路径
+  public static final String ORIGIN_PATH = "/home/static/gallery/origin";
+
 }

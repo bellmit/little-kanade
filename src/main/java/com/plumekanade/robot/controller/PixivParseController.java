@@ -50,11 +50,13 @@ public class PixivParseController {
    *
    * @param sexy 涩图等级 0普通 1涩 2露点
    * @param num  该插画作品有几张图
+   * @param originSave 是否保存原图 0否 1是
    */
   @GetMapping("/artwork")
   @Transactional(rollbackFor = Exception.class)
   public ResultMsg item(@RequestParam("url") String url, @RequestParam(value = "sexy", required = false, defaultValue = "0") Integer sexy,
-                        @RequestParam(value = "num", required = false, defaultValue = "1") Integer num) {
+                        @RequestParam(value = "num", required = false, defaultValue = "1") Integer num,
+                        @RequestParam(value = "originSave", defaultValue = "0") Integer originSave) {
     try {
       String pixivId = PixivUtils.getArtworkId(url);
       PixivArtwork.Illust illust = PixivUtils.parseArtWork(Jsoup.connect(url).get(), pixivId);
@@ -78,22 +80,31 @@ public class PixivParseController {
       url = originUrl;
       String suffix = ProjectConst.POINT + ProjectConst.JPG;
       Header header = new BasicHeader(PixivConst.REFERER_KEY, PixivConst.REFERER_VAL);
+      String jpg = "p0.jpg", png = "p0.png";
       for (int i = 0; i < num; i++) {
         // png压缩效果不明显 基本压缩不了多少
         String name = filename + i + suffix;
-        File file = new File(path + name);
-        Gallery gallery = new Gallery(illust.getTitle(), name, pixivId, illust.getUserName(), sexy,
-            file.getPath(), galleryUrl + name, tags, illust.getUploadDate());
         if (i > 0) {
-          url = originUrl.replace("p0.jpg", "p" + i + suffix);
+          url = originUrl.replaceAll(jpg, "p" + i + suffix).replaceAll(png, "p" + i + suffix);
         }
 
         HttpEntity httpEntity = ServletUtils.getWithHeader(url, header);
         if (null == httpEntity) {
           return ResultMsg.error("获取图片失败，请查看是否能连接到 https://pixiv.net/");
         }
-        // 压缩
-        Thumbnails.of(httpEntity.getContent()).size(2560, 2560).outputQuality(0.9f).toFile(file);
+
+        File file = new File(path + name);
+        // 原图是否存入本地
+        if (null != originSave && 1 == originSave) {
+          File originFile = new File(ProjectConst.ORIGIN_PATH + name.replaceAll(".jpg", originUrl.substring(originUrl.length() - 4)));
+          Thumbnails.of(httpEntity.getContent()).toFile(originFile);
+          Thumbnails.of(originFile).size(2560, 2560).outputQuality(0.9f).toFile(file);
+        } else {
+          // 压缩
+          Thumbnails.of(httpEntity.getContent()).size(2560, 2560).outputQuality(0.9f).toFile(file);
+        }
+        Gallery gallery = new Gallery(illust.getTitle(), name, pixivId, illust.getUserName(), sexy,
+            file.getPath(), galleryUrl + name, tags, illust.getUploadDate());
         gallery.setSize(file.length());
         Gallery existGallery = galleryService.getImage(gallery.getPath());
         if (null != existGallery) {
