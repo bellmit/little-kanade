@@ -47,12 +47,12 @@ public class ProjectConst {
   public static final String REPLACE_CHAR = "X";
 
   // 图库普通图
-  public static final String NORMAL_GALLERY_PATH = "/home/static/gallery/normal";
+  public static final String NORMAL_GALLERY_PATH = "/home/static/gallery/normal/";
   // 图库涩图
-  public static final String SEXY_GALLERY_PATH = "/home/static/gallery/sexy";
+  public static final String SEXY_GALLERY_PATH = "/home/static/gallery/sexy/";
   // 图库露点图
-  public static final String BARE_GALLERY_PATH = "/home/static/gallery/bare";
+  public static final String BARE_GALLERY_PATH = "/home/static/gallery/bare/";
   // 原图路径
-  public static final String ORIGIN_PATH = "/home/static/gallery/origin";
+  public static final String ORIGIN_PATH = "/home/static/gallery/origin/";
 
 }

@@ -16,6 +16,6 @@ public class AuthConst {
 
   public static final String TOKEN_HEADER = "kanade-token";
   public static final BCryptPasswordEncoder PWD_ENCODER = new BCryptPasswordEncoder();
-  public static final List<String> EXCLUDE_PATH = new ArrayList<>(Arrays.asList("common", "wechat", "pixivParse"));
+  public static final List<String> EXCLUDE_PATH = new ArrayList<>(Arrays.asList("/common/**", "/wechat/**", "/pixivParse/**"));
 
 }

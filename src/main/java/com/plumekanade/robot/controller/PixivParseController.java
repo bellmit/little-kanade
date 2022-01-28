@@ -4,6 +4,7 @@ import com.plumekanade.robot.constants.PixivConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.Gallery;
 import com.plumekanade.robot.service.GalleryService;
+import com.plumekanade.robot.utils.CommonUtils;
 import com.plumekanade.robot.utils.PixivUtils;
 import com.plumekanade.robot.utils.ServletUtils;
 import com.plumekanade.robot.vo.PixivArtwork;
@@ -71,7 +72,7 @@ public class PixivParseController {
 
       String tags = tagBuilder.substring(0, tagBuilder.length() - 1);
       String originUrl = illust.getUrls().getOriginal();
-      String path = (sexy == 0 ? ProjectConst.NORMAL_GALLERY_PATH : (sexy == 1 ? ProjectConst.SEXY_GALLERY_PATH : ProjectConst.BARE_GALLERY_PATH)) + "/";
+      String path = sexy == 0 ? ProjectConst.NORMAL_GALLERY_PATH : (sexy == 1 ? ProjectConst.SEXY_GALLERY_PATH : ProjectConst.BARE_GALLERY_PATH);
       // 防路径插入
       String filename = (illust.getUserName() + UNDERSCORE + illust.getTitle() + UNDERSCORE + pixivId + UNDERSCORE + "p").replaceAll("/", "");
       String galleryUrl = ProjectConst.GALLERY_URL + (sexy == 0 ? "normal/" : (sexy == 1 ? "sexy/" : "bare/"));
@@ -95,9 +96,9 @@ public class PixivParseController {
         File file = new File(path + name);
         // 原图是否存入本地
         if (null != originSave && 1 == originSave) {
-          File originFile = new File(ProjectConst.ORIGIN_PATH + name.replaceAll(".jpg", originUrl.substring(originUrl.length() - 4)));
-          Thumbnails.of(httpEntity.getContent()).toFile(originFile);
-          Thumbnails.of(originFile).size(2560, 2560).outputQuality(0.9f).toFile(file);
+          String originPath = ProjectConst.ORIGIN_PATH + name.replaceAll(".jpg", originUrl.substring(originUrl.length() - 4));
+          CommonUtils.writeFile(httpEntity.getContent(), originPath);
+          Thumbnails.of(new File(originPath)).size(2560, 2560).outputQuality(0.9f).toFile(file);
         } else {
           // 压缩
           Thumbnails.of(httpEntity.getContent()).size(2560, 2560).outputQuality(0.9f).toFile(file);
