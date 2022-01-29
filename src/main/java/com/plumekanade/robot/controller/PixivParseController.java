@@ -78,18 +78,18 @@ public class PixivParseController {
       String galleryUrl = ProjectConst.GALLERY_URL + (sexy == 0 ? "normal/" : (sexy == 1 ? "sexy/" : "bare/"));
 
       url = originUrl;
-      String suffix = ProjectConst.POINT + ProjectConst.JPG;
       Header header = new BasicHeader(PixivConst.REFERER_KEY, PixivConst.REFERER_VAL);
-      String jpg = "p0.jpg", png = "p0.png";
+      String p0 = "p0", jpg = ".jpg", png = ".png";
       for (int i = 0; i < num; i++) {
         // png压缩效果不明显 基本压缩不了多少
-        String name = filename + i + suffix;
+        String name = filename + i + jpg;
         if (i > 0) {
-          url = originUrl.replaceAll(jpg, "p" + i + suffix).replaceAll(png, "p" + i + suffix);
+          url = originUrl.replaceAll(p0 + jpg, "p" + i + jpg).replaceAll(p0 + png, "p" + i + png);
         }
 
         HttpEntity httpEntity = ServletUtils.getWithHeader(url, header);
         if (null == httpEntity) {
+          log.error("【Pixiv】图片url: " + url);
           return ResultMsg.error("获取图片失败，请查看是否能连接到 https://pixiv.net/");
         }
 
