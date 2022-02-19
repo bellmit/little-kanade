@@ -36,6 +36,10 @@ public class APIConst {
 //  public static final String NLP_DOMAIN = "https://nlp.tencentcloudapi.com";
 //  public static final String NLP_REGION = "ap-guangzhou";
 
+  // 国家疫情风险地区查询
+  public static final String DISEASE_RISK_AREA = "http://103.66.32.242:8005/zwfwMovePortal/interface/interfaceJson";
+
+
 
   //===================================== 米哈游 原神API =====================================//
   public static final String MI_HO_YO_SERVER = "https://api-takumi.mihoyo.com";

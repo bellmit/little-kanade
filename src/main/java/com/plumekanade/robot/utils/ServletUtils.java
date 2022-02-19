@@ -5,6 +5,7 @@ import com.plumekanade.robot.constants.APIConst;
 import com.plumekanade.robot.constants.ProjectConst;
 import com.plumekanade.robot.entity.RandomEmoticon;
 import com.plumekanade.robot.enums.CodeEnum;
+import com.plumekanade.robot.vo.DiseaseRiskParam;
 import com.plumekanade.robot.vo.LoLiConResult;
 import com.plumekanade.robot.vo.MiHoYoEmoticon;
 import com.plumekanade.robot.vo.ResultMsg;
@@ -18,12 +19,8 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
-
 import javax.servlet.http.HttpServletResponse;
-import java.io.ByteArrayOutputStream;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.InputStream;
+import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
@@ -296,6 +293,32 @@ public class ServletUtils {
       log.error("【POST】LoLiCon的API请求出错, 堆栈信息: ", e);
     }
     return new ArrayList<>();
+  }
+
+  /**
+   * 疫情风险地区查询请求
+   */
+  public static void reqDiseaseRiskArea(DiseaseRiskParam param) {
+    HttpPost post = new HttpPost(APIConst.DISEASE_RISK_AREA);
+    post.setHeader("x-wif-signature", "");
+    post.setHeader("x-wif-timestamp", "");
+    post.setHeader("x-wif-paasid", "smt-application");
+    post.setHeader("x-wif-nonce", "QkjjtiLM2dCratiA");
+    post.setHeader(APIConst.CONTENT_TYPE, APIConst.CONTENT_TYPE_JSON);
+    // 设置参数
+    StringEntity entity = new StringEntity(Objects.requireNonNull(MapperUtils.serialize(param)), StandardCharsets.UTF_8);
+    entity.setContentEncoding(StandardCharsets.UTF_8.toString());
+    post.setEntity(entity);
+    // 发送Json格式的数据请求
+    try {
+      CloseableHttpResponse response = HttpClients.createDefault().execute(post);
+      // 判断返回状态是否为200
+      if (ProjectConst.SUCCESS.equals(response.getStatusLine().getStatusCode())) {
+        log.info("【POST】获取疫情风险地区数据: " + EntityUtils.toString(response.getEntity()));
+      }
+    } catch (Exception e) {
+      log.error("【POST】获取国家疫情风险地区失败, 异常堆栈: ", e);
+    }
   }
 
 }
